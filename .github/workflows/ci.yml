@@ -146,6 +146,11 @@ jobs:
       with:
         bun-version: latest
 
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
     - name: Verify Fish installation
       run: fish --version
 
@@ -246,6 +251,11 @@ jobs:
       with:
         bun-version: latest
 
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
     - name: Run integration test
       run: |
         fish -c '
@@ -309,6 +319,11 @@ jobs:
       uses: oven-sh/setup-bun@v2
       with:
         bun-version: latest
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
 
     - name: Run performance tests
       run: |

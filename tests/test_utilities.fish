@@ -7,7 +7,7 @@ function test_get_repo_root_in_main
     cd $TEST_TEMP_DIR/test_repo
     set repo_root (_wt_get_repo_root)
     assert_success "Should get repo root successfully"
-    assert_equal "$TEST_TEMP_DIR/test_repo" $repo_root "Should return correct root"
+    assert_equal (realpath "$TEST_TEMP_DIR/test_repo") (realpath $repo_root) "Should return correct root"
 
     test_pass
 end
@@ -20,7 +20,7 @@ function test_get_repo_root_in_worktree
 
     set repo_root (_wt_get_repo_root)
     assert_success "Should get repo root from worktree"
-    assert_equal "$TEST_TEMP_DIR/test_repo" $repo_root "Should return main repo root"
+    assert_equal (realpath "$TEST_TEMP_DIR/test_repo") (realpath $repo_root) "Should return main repo root"
 
     test_pass
 end
@@ -44,7 +44,7 @@ function test_get_repo_root_nested_dir
 
     set repo_root (_wt_get_repo_root)
     assert_success "Should get repo root from nested dir"
-    assert_equal "$TEST_TEMP_DIR/test_repo" $repo_root "Should return correct root"
+    assert_equal (realpath "$TEST_TEMP_DIR/test_repo") (realpath $repo_root) "Should return correct root"
 
     test_pass
 end
