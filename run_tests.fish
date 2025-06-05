@@ -13,8 +13,8 @@ if not test -d $test_dir
     exit 1
 end
 
-# Find all test files
-set test_files (find $test_dir -name "test_*.fish" -type f | sort)
+# Find all test files (excluding the test runner itself)
+set test_files (find $test_dir -name "test_*.fish" -type f | grep -v test_runner.fish | sort)
 
 if test (count $test_files) -eq 0
     echo "Error: No test files found in $test_dir"

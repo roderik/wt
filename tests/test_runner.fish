@@ -18,12 +18,6 @@ function test_setup --description "Set up test environment"
     set -gx TEST_TEMP_DIR (mktemp -d)
     set -gx ORIGINAL_PWD (pwd)
 
-    # Debug: Ensure TEST_TEMP_DIR is set
-    if test -z "$TEST_TEMP_DIR"
-        echo "ERROR: TEST_TEMP_DIR is not set!"
-        exit 1
-    end
-
     # Find the wt.fish file - check multiple possible locations
     set -l possible_paths \
         (dirname (dirname (realpath (status -f))))/wt.fish \
