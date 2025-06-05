@@ -14,8 +14,9 @@ set -g COLOR_YELLOW \e\[33m
 set -g COLOR_RESET \e\[0m
 
 function test_setup --description "Set up test environment"
-    # Create temporary directory for tests
-    set -gx TEST_TEMP_DIR (mktemp -d)
+    # Create temporary directory for tests in current folder structure
+    set -gx TEST_TEMP_DIR (pwd)/.test_tmp_(random)
+    mkdir -p $TEST_TEMP_DIR
     set -gx ORIGINAL_PWD (pwd)
 
     # Find the wt.fish file - check multiple possible locations
@@ -54,7 +55,9 @@ end
 
 function test_teardown --description "Clean up test environment"
     cd $ORIGINAL_PWD
-    rm -rf $TEST_TEMP_DIR
+    if test -d "$TEST_TEMP_DIR"
+        rm -rf $TEST_TEMP_DIR
+    end
 end
 
 function test_case --description "Start a new test case" --argument name

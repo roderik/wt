@@ -287,71 +287,8 @@ packages:
     # Test with bun
     cd $TEST_TEMP_DIR/test_repo
     rm pnpm-lock.yaml
-    echo '{
-  "lockfileVersion": 0,
-  "workspaces": {
-    "": {
-      "name": "test",
-      "dependencies": {
-        "is-even": "^1.0.0"
-      }
-    }
-  },
-  "packages": {
-    "is-even": ["is-even@1.0.0"],
-    "is-even@1.0.0": {
-      "name": "is-even",
-      "resolution": {
-        "resolved": "https://registry.npmjs.org/is-even/-/is-even-1.0.0.tgz",
-        "integrity": "sha512-zfTTjx9RF1H9xBQkJ2NqzSv7MaC65VamezGLS7BoLfIvTd1r8rKDGifSjwpe4e8bVqcXSgkk7tZvUrqyf8XLvA=="
-      },
-      "dependencies": {
-        "is-odd": "^0.1.2"
-      }
-    },
-    "is-odd": ["is-odd@0.1.2"],
-    "is-odd@0.1.2": {
-      "name": "is-odd",
-      "resolution": {
-        "resolved": "https://registry.npmjs.org/is-odd/-/is-odd-0.1.2.tgz",
-        "integrity": "sha512-Bj5ln0TQHJ8nyPx1W7XITMUBW7aDI1SzfNy7REhLr5xmhwjDO/01S3V4PypCpCwaldbFOgG7PDs8UYDdWW9hQQ=="
-      },
-      "dependencies": {
-        "is-number": "^3.0.0"
-      }
-    },
-    "is-number": ["is-number@3.0.0"],
-    "is-number@3.0.0": {
-      "name": "is-number",
-      "resolution": {
-        "resolved": "https://registry.npmjs.org/is-number/-/is-number-3.0.0.tgz",
-        "integrity": "sha512-4cbC0CCbwm4A6TKnZTx1+CvJPDdPnUiC1WT7ZWJr9s7CIJC/gxMOOlKCJR0LPuuLBPdE7GsUwg6AqG5qZfQ4eg=="
-      },
-      "dependencies": {
-        "kind-of": "^3.0.2"
-      }
-    },
-    "kind-of": ["kind-of@3.2.2"],
-    "kind-of@3.2.2": {
-      "name": "kind-of",
-      "resolution": {
-        "resolved": "https://registry.npmjs.org/kind-of/-/kind-of-3.2.2.tgz",
-        "integrity": "sha512-NOW9QQXMoZGg/oqnVNoNTTIFEIid1627WCffUBJEdMxYFc7G6ypF3oncLfvNhHOJfzFD1H8lxvNyPKYQvYeBjQ=="
-      },
-      "dependencies": {
-        "is-buffer": "^1.1.5"
-      }
-    },
-    "is-buffer": ["is-buffer@1.1.6"],
-    "is-buffer@1.1.6": {
-      "name": "is-buffer",
-      "resolution": {
-        "resolved": "https://registry.npmjs.org/is-buffer/-/is-buffer-1.1.6.tgz",
-        "integrity": "sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVWka0mHhYEdW3yvwSB8s9Vqpw=="
-      }
-    }
-  }
-}' >bun.lock
+    # For bun, just use an empty lockfile - it will be regenerated properly
+    touch bun.lock
     git add bun.lock
     git rm pnpm-lock.yaml
     git commit -m "Switch to bun" --quiet

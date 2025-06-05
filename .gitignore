@@ -1,3 +1,6 @@
 
 # Pre-commit
 .pre-commit-config.yaml.lock
+
+# Test temporary directories
+.test_tmp_*
