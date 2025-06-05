@@ -356,15 +356,15 @@ function test_integration_worktree_removal_scenarios
     assert_dir_not_exists .worktrees/remove-both-test "Worktree should be gone"
     assert_branch_not_exists remove-both-test "Branch should be gone"
 
-    # Scenario 3: Try to remove while inside worktree
+    # Scenario 3: Remove while inside worktree (should auto-switch to main)
     wt new inside-test
-    wt remove inside-test 2>/dev/null
-    assert_failure "Should fail when inside worktree"
-
-    # Go back and remove properly
-    cd $TEST_TEMP_DIR/test_repo
+    # We're now inside the worktree
     echo y | wt remove inside-test
-    assert_success "Should remove from outside"
+    assert_success "Should succeed by auto-switching to main"
+    
+    # Verify we're now in main repository
+    assert_equal (pwd) "$TEST_TEMP_DIR/test_repo" "Should be in main repository"
+    assert_dir_not_exists .worktrees/inside-test "Worktree should be removed"
 
     test_pass
 end
