@@ -207,7 +207,7 @@ function _wt_new --description "Create new worktree"
         # Check for package manager files and run install
         if test -f "package.json"
             echo ""
-            if test -f "bun.lockb" -o -f "bunfig.toml" -o -f "bun.lock"
+            if test -f "bun.lock" -o -f "bun.lockb" -o -f "bunfig.toml"
                 echo "📦 Running bun install..."
                 if bun install
                     echo "✅ Dependencies installed successfully"

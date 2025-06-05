@@ -167,8 +167,8 @@ function test_integration_package_manager_detection
     # Test with bun
     cd $TEST_TEMP_DIR/test_repo
     rm pnpm-lock.yaml
-    echo lockfile >bun.lockb
-    git add bun.lockb
+    echo lockfile >bun.lock
+    git add bun.lock
     git rm pnpm-lock.yaml
     git commit -m "Switch to bun" --quiet
 

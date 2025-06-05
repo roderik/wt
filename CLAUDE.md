@@ -73,7 +73,7 @@ Always use `_wt_get_repo_root` to find repository root, as it handles:
 - Nested directory traversal
 
 ### Package Manager Priority
-1. bun.lockb/bunfig.toml → Bun
+1. bun.lock/bun.lockb/bunfig.toml → Bun
 2. package-lock.json → NPM
 3. yarn.lock → Yarn
 4. pnpm-lock.yaml → PNPM

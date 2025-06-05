@@ -136,7 +136,7 @@ The tool automatically detects and uses the appropriate package manager:
 
 | Detected File | Package Manager Used | Command Run |
 |---------------|---------------------|-------------|
-| `bun.lockb` or `bunfig.toml` | Bun | `bun install` |
+| `bun.lock`, `bun.lockb`, or `bunfig.toml` | Bun | `bun install` |
 | `package-lock.json` | NPM | `npm install` |
 | `yarn.lock` | Yarn | `yarn install` |
 | `pnpm-lock.yaml` | PNPM | `pnpm install` |
