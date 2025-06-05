@@ -13,6 +13,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  statuses: write
+  checks: write
+
 jobs:
   pre-checks:
     name: Pre-flight Checks
@@ -21,6 +28,9 @@ jobs:
       should_test: ${{ steps.check.outputs.should_test }}
 
     steps:
+    - uses: fuxingloh/multi-labeler@v4
+      if: github.event_name == 'pull_request'
+
     - name: Checkout code
       uses: actions/checkout@v4
       with:
@@ -108,9 +118,6 @@ jobs:
       fail-fast: false
 
     steps:
-    - uses: fuxingloh/multi-labeler@v4
-      if: github.event_name == 'pull_request'
-
     - name: Checkout code
       uses: actions/checkout@v4
 
