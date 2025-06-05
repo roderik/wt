@@ -5,6 +5,9 @@ function test_wt_status_in_main
     test_case "wt status - in main repository"
 
     cd $TEST_TEMP_DIR/test_repo
+    # Ensure we're on main branch
+    git checkout main --quiet 2>/dev/null || true
+
     set output (wt status 2>&1)
     assert_success "Should show status successfully"
 
