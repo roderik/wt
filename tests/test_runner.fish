@@ -195,6 +195,21 @@ end
 function run_test_file --description "Run a test file" --argument file
     echo ""
     echo "$COLOR_YELLOW=== Running tests from $file ===$COLOR_RESET"
+
+    # Clean up any leftover worktrees before running tests
+    cd $TEST_TEMP_DIR/test_repo 2>/dev/null
+    if test $status -eq 0
+        git worktree prune 2>/dev/null
+        # Remove all worktrees except main
+        for worktree in (git worktree list --porcelain | grep "^worktree" | grep -v "test_repo\$" | cut -d' ' -f2)
+            git worktree remove --force $worktree 2>/dev/null
+        end
+        # Clean up branches
+        for branch in (git branch | grep -v "^\*" | grep -v "main")
+            git branch -D (string trim $branch) 2>/dev/null
+        end
+    end
+
     source $file
 end
 

@@ -330,7 +330,10 @@ function _wt_list --description "List all git worktrees"
                 end
 
                 # Format the output
-                if string match -q "*/.worktrees/*" $current_path
+                # Get repository root to check if this is a worktree
+                set repo_root (_wt_get_repo_root)
+                # Check if this path is under repo_root/.worktrees/
+                if string match -q "$repo_root/.worktrees/*" $current_path
                     set display_path (basename $current_path)
                     echo -n "🌿 $current_branch"
                 else
@@ -367,7 +370,15 @@ function _wt_status --description "Show current worktree status"
     echo "🌿 Branch: $current_branch"
 
     # Check if we're in a worktree or main repo
-    if string match -q "*/.worktrees/*" $current_dir
+    # Get repository root to check if this is a worktree
+    set repo_root (_wt_get_repo_root)
+    if test $status -ne 0
+        echo "Error: Could not determine repository root"
+        return 1
+    end
+
+    # Check if current directory is under repo_root/.worktrees/
+    if string match -q "$repo_root/.worktrees/*" $current_dir
         echo "📍 Type: Worktree"
     else
         echo "📍 Type: Main repository"
@@ -495,12 +506,15 @@ function _wt_clean --description "Clean up all git worktrees"
             # Include worktrees based on flag
             if test $include_all -eq 1
                 # Include all worktrees except the main one
-                if test "$current_worktree" != "$repo_root"
+                # Use realpath to ensure path comparison works correctly
+                if test (realpath "$current_worktree" 2>/dev/null) != (realpath "$repo_root" 2>/dev/null)
                     set worktrees_to_remove $worktrees_to_remove $current_worktree
                 end
             else
-                # Only include worktrees in .worktrees directory
-                if string match -q "*/.worktrees/*" $current_worktree
+                # Only include worktrees in .worktrees directory of the current repo
+                # Check if the worktree is under repo_root/.worktrees/
+                set worktrees_dir "$repo_root/.worktrees"
+                if string match -q "$worktrees_dir/*" $current_worktree
                     set worktrees_to_remove $worktrees_to_remove $current_worktree
                 end
             end
