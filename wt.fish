@@ -18,6 +18,9 @@
 #   wt remove <branch>              - Remove specific worktree
 #   wt status                       - Show current worktree status
 #   wt help                         - Show detailed help
+#   wt --claude                     - Launch Claude Code editor
+#   wt --cursor                     - Launch Cursor editor
+#   wt --all                        - Launch both editors
 #
 # EXAMPLES:
 #   wt new feature-auth             # Create from HEAD
@@ -53,6 +56,20 @@ function wt --description "Git worktree management"
             _wt_status
         case help h
             _wt_help
+        case --claude
+            # Launch Claude with dangerously skip permissions
+            echo "Launching Claude Code..."
+            claude --dangerously-skip-permissions
+        case --cursor
+            # Launch Cursor in current directory
+            echo "Launching Cursor..."
+            cursor .
+        case --all
+            # Launch both editors - Cursor first (UI), then Claude (terminal)
+            echo "Launching Cursor..."
+            cursor .
+            echo "Launching Claude Code..."
+            claude --dangerously-skip-permissions
         case '*'
             echo "Error: Unknown subcommand '$subcommand'"
             echo "Run 'wt help' for usage information"
@@ -75,12 +92,20 @@ function _wt_help --description "Show wt help information"
     echo "  status, st                   Show current worktree status"
     echo "  help, h                      Show this help message"
     echo ""
+    echo "EDITOR OPTIONS:"
+    echo "  --claude                     Launch Claude Code (with --dangerously-skip-permissions)"
+    echo "  --cursor                     Launch Cursor in current directory"
+    echo "  --all                        Launch both Cursor and Claude"
+    echo ""
     echo "EXAMPLES:"
     echo "  wt new feature-auth          Create from current HEAD"
     echo "  wt new hotfix --from main    Create from main branch"
     echo "  wt switch feature-auth       Switch to worktree"
     echo "  wt remove api-fix            Remove specific worktree"
     echo "  wt status                    Show current status"
+    echo "  wt --claude                  Launch Claude Code editor"
+    echo "  wt --cursor                  Launch Cursor editor"
+    echo "  wt --all                     Launch both editors"
     echo ""
     echo "TIPS:"
     echo "  • Worktrees are created in .worktrees/ directory"
@@ -570,13 +595,16 @@ end
 
 # Add completion support
 complete -c wt -f
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a new -d "Create new worktree"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "switch s" -d "Switch to worktree"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "list ls" -d "List worktrees"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a clean -d "Clean up worktrees"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "remove rm" -d "Remove worktree"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "status st" -d "Show status"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "help h" -d "Show help"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a new -d "Create new worktree"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "switch s" -d "Switch to worktree"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "list ls" -d "List worktrees"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a clean -d "Clean up worktrees"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "remove rm" -d "Remove worktree"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "status st" -d "Show status"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "help h" -d "Show help"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a --claude -d "Launch Claude Code"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a --cursor -d "Launch Cursor"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a --all -d "Launch both editors"
 
 # Complete branch names for switch and remove commands
 complete -c wt -n "__fish_seen_subcommand_from switch s remove rm" -a "(git branch --format='%(refname:short)')"
