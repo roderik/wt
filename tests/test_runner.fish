@@ -48,8 +48,16 @@ function test_setup --description "Set up test environment"
     cd $TEST_TEMP_DIR/test_repo
     git config user.email "test@example.com"
     git config user.name "Test User"
+
+    # Ensure we have a main branch (rename from master if needed)
+    set current_branch (git branch --show-current)
+    if test "$current_branch" = master
+        git branch -m main
+    end
+
     echo "# Test Repository" >README.md
-    git add README.md
+    echo ".worktrees/" >.gitignore
+    git add README.md .gitignore
     git commit -m "Initial commit" --quiet
 end
 
@@ -199,6 +207,9 @@ function run_test_file --description "Run a test file" --argument file
     # Clean up any leftover worktrees before running tests
     cd $TEST_TEMP_DIR/test_repo 2>/dev/null
     if test $status -eq 0
+        # Make sure we're on main branch before cleaning up
+        git checkout main --quiet 2>/dev/null || true
+
         git worktree prune 2>/dev/null
         # Remove all worktrees except main
         for worktree in (git worktree list --porcelain | grep "^worktree" | grep -v "test_repo\$" | cut -d' ' -f2)

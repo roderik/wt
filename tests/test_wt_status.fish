@@ -5,12 +5,15 @@ function test_wt_status_in_main
     test_case "wt status - in main repository"
 
     cd $TEST_TEMP_DIR/test_repo
+    # Get the default branch name (could be main or master)
+    set default_branch (git symbolic-ref --short HEAD)
+
     set output (wt status 2>&1)
     assert_success "Should show status successfully"
 
     assert_contains "$output" "Current Worktree Status" "Should show header"
     assert_contains "$output" "Type: Main repository" "Should identify as main repo"
-    assert_contains "$output" "Branch: main" "Should show main branch"
+    assert_contains "$output" "Branch: $default_branch" "Should show default branch"
 
     test_pass
 end

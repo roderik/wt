@@ -11,7 +11,7 @@
 # but the separate file approach is cleaner and more maintainable.
 #
 # USAGE:
-#   wt new <branch> [--from <ref>]  - Create worktree from ref (default: HEAD)
+#   wt new <branch> [--from <ref>]  - Create worktree from ref (default: main/master)
 #   wt switch <branch>              - Switch to existing worktree
 #   wt list                         - List all worktrees with status
 #   wt clean [--all]                - Clean up worktrees (--all includes non-.worktrees)
@@ -23,8 +23,8 @@
 #   wt --all                        - Launch both editors
 #
 # EXAMPLES:
-#   wt new feature-auth             # Create from HEAD
-#   wt new hotfix --from main       # Create from main branch
+#   wt new feature-auth             # Create from default branch
+#   wt new hotfix --from v1.0.0     # Create from specific tag
 #   wt switch feature-auth          # Switch to worktree
 #   wt remove api-fix               # Remove specific worktree
 #   wt status                       # Show current status
@@ -84,7 +84,7 @@ function _wt_help --description "Show wt help information"
     echo "  wt <subcommand> [arguments]"
     echo ""
     echo "SUBCOMMANDS:"
-    echo "  new <branch> [--from <ref>]  Create new worktree from ref (default: HEAD)"
+    echo "  new <branch> [--from <ref>]  Create new worktree from ref (default: main/master)"
     echo "  switch, s <branch>           Switch to existing worktree"
     echo "  list, ls                     List all worktrees with status"
     echo "  clean [--all]                Clean up worktrees (--all includes all)"
@@ -98,9 +98,10 @@ function _wt_help --description "Show wt help information"
     echo "  --all                        Launch both Cursor and Claude"
     echo ""
     echo "EXAMPLES:"
-    echo "  wt new feature-auth          Create from current HEAD"
-    echo "  wt new hotfix --from main    Create from main branch"
+    echo "  wt new feature-auth          Create from default branch"
+    echo "  wt new hotfix --from v1.0.0  Create from specific tag"
     echo "  wt switch feature-auth       Switch to worktree"
+    echo "  wt switch main               Switch back to main branch"
     echo "  wt remove api-fix            Remove specific worktree"
     echo "  wt status                    Show current status"
     echo "  wt --claude                  Launch Claude Code editor"
@@ -155,7 +156,16 @@ function _wt_new --description "Create new worktree"
     end
 
     set branch_name $argv[1]
-    set from_ref HEAD
+
+    # Determine the default branch - check for main first, then master
+    if git show-ref --verify --quiet refs/heads/main
+        set from_ref main
+    else if git show-ref --verify --quiet refs/heads/master
+        set from_ref master
+    else
+        # Fallback to current HEAD
+        set from_ref HEAD
+    end
 
     # Parse optional --from argument
     set i 2
@@ -294,6 +304,27 @@ function _wt_switch --description "Switch to existing worktree"
     if test $status -ne 0
         echo "Error: Could not find git repository root"
         return 1
+    end
+
+    # Special handling for default branches (main/master)
+    if test "$branch_name" = main -o "$branch_name" = master
+        cd $repo_root
+        # Try to checkout the requested branch
+        if git checkout $branch_name --quiet 2>/dev/null
+            echo "✅ Switched to main repository"
+            echo "📁 Location: "(pwd)
+            echo "🌿 Branch: "(git branch --show-current)
+
+            # Show brief status
+            set modified_count (git status --porcelain | wc -l | string trim)
+            if test $modified_count -gt 0
+                echo "📝 Modified files: $modified_count"
+            end
+            return 0
+        else
+            echo "Error: Branch '$branch_name' does not exist in main repository"
+            return 1
+        end
     end
 
     set worktree_path "$repo_root/.worktrees/$branch_name"
@@ -521,6 +552,9 @@ function _wt_clean --description "Clean up all git worktrees"
         return 1
     end
 
+    # Normalize repo root path
+    set repo_root_normalized (realpath $repo_root 2>/dev/null || echo $repo_root)
+
     # Check for --all flag
     set include_all 0
     if contains -- --all $argv
@@ -535,11 +569,12 @@ function _wt_clean --description "Clean up all git worktrees"
     for line in $worktree_info
         if string match -q "worktree *" $line
             set current_worktree (string sub -s 10 $line)
+            set current_worktree_normalized (realpath $current_worktree 2>/dev/null || echo $current_worktree)
+
             # Include worktrees based on flag
             if test $include_all -eq 1
                 # Include all worktrees except the main one
-                # Use realpath to ensure path comparison works correctly
-                if test (realpath "$current_worktree" 2>/dev/null) != (realpath "$repo_root" 2>/dev/null)
+                if test "$current_worktree_normalized" != "$repo_root_normalized"
                     set worktrees_to_remove $worktrees_to_remove $current_worktree
                 end
             else
