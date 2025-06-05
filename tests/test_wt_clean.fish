@@ -96,10 +96,15 @@ end
 function test_wt_clean_outside_repo
     test_case "wt clean - outside git repo"
 
-    cd $TEST_TEMP_DIR
+    # Create a completely isolated temp directory
+    set isolated_dir (mktemp -d)
+    cd $isolated_dir
     set output (wt clean 2>&1)
     assert_failure "Should fail outside git repo"
     assert_contains "$output" "Not in a git repository" "Should show error message"
+
+    # Clean up
+    rm -rf $isolated_dir
 
     test_pass
 end

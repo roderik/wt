@@ -117,9 +117,11 @@ function test_integration_error_handling
     assert_failure "Should fail with duplicate name"
 
     # Try operations outside git repo
-    cd $TEST_TEMP_DIR
+    set isolated_dir (mktemp -d)
+    cd $isolated_dir
     wt list 2>/dev/null
     assert_failure "Should fail outside repo"
+    rm -rf $isolated_dir
 
     test_pass
 end
@@ -131,7 +133,7 @@ function test_integration_package_manager_detection
 
     # Test with package.json (npm)
     echo '{"name": "test"}' >package.json
-    echo '{}' >package-lock.json
+    echo '{"name": "test", "lockfileVersion": 3, "requires": true, "packages": {}}' >package-lock.json
     git add package.json package-lock.json
     git commit -m "Add npm project files" --quiet
 
@@ -143,7 +145,7 @@ function test_integration_package_manager_detection
     # Test with yarn
     cd $TEST_TEMP_DIR/test_repo
     rm package-lock.json
-    echo '' >yarn.lock
+    echo '# yarn lockfile v1' >yarn.lock
     git add yarn.lock
     git rm package-lock.json
     git commit -m "Switch to yarn" --quiet
@@ -155,7 +157,7 @@ function test_integration_package_manager_detection
     # Test with pnpm
     cd $TEST_TEMP_DIR/test_repo
     rm yarn.lock
-    echo '' >pnpm-lock.yaml
+    echo 'lockfileVersion: "6.0"' >pnpm-lock.yaml
     git add pnpm-lock.yaml
     git rm yarn.lock
     git commit -m "Switch to pnpm" --quiet
@@ -167,7 +169,7 @@ function test_integration_package_manager_detection
     # Test with bun
     cd $TEST_TEMP_DIR/test_repo
     rm pnpm-lock.yaml
-    echo '' >bun.lock
+    echo '{"lockfileVersion": 0, "packages": {}}' >bun.lock
     git add bun.lock
     git rm pnpm-lock.yaml
     git commit -m "Switch to bun" --quiet

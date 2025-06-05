@@ -28,9 +28,14 @@ end
 function test_get_repo_root_outside_repo
     test_case "_wt_get_repo_root - outside repository"
 
-    cd $TEST_TEMP_DIR
+    # Create a completely isolated temp directory
+    set isolated_dir (mktemp -d)
+    cd $isolated_dir
     _wt_get_repo_root 2>/dev/null
     assert_failure "Should fail outside repository"
+
+    # Clean up
+    rm -rf $isolated_dir
 
     test_pass
 end

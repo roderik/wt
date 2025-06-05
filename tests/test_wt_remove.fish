@@ -111,9 +111,14 @@ end
 function test_wt_remove_outside_repo
     test_case "wt remove - outside git repo"
 
-    cd $TEST_TEMP_DIR
+    # Create a completely isolated temp directory
+    set isolated_dir (mktemp -d)
+    cd $isolated_dir
     wt remove some-branch 2>/dev/null
     assert_failure "Should fail outside git repo"
+
+    # Clean up
+    rm -rf $isolated_dir
 
     test_pass
 end

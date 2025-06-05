@@ -44,7 +44,7 @@ function test_setup --description "Set up test environment"
     # Initialize test git repo
     cd $TEST_TEMP_DIR
     git init --quiet test_repo
-    cd test_repo
+    cd $TEST_TEMP_DIR/test_repo
     git config user.email "test@example.com"
     git config user.name "Test User"
     echo "# Test Repository" >README.md
