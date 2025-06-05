@@ -361,7 +361,7 @@ function test_integration_worktree_removal_scenarios
     # We're now inside the worktree
     echo y | wt remove inside-test
     assert_success "Should succeed by auto-switching to main"
-    
+
     # Verify we're now in main repository
     assert_equal (pwd) "$TEST_TEMP_DIR/test_repo" "Should be in main repository"
     assert_dir_not_exists .worktrees/inside-test "Worktree should be removed"
