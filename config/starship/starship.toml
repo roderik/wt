@@ -1,0 +1,106 @@
+# Starship Configuration
+# Location: ~/.config/starship.toml
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Sets user-defined palette
+palette = "catppuccin_macchiato"
+
+[nodejs]
+detect_files = ['package.json', '.node-version', '!bunfig.toml', '!bun.lockb', '!bun.lock']
+
+[cmd_duration]
+disabled = false
+min_time = 500
+format = 'underwent [$duration](bold yellow)'
+
+[git_metrics]
+disabled = false
+added_style = 'bold blue'
+format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+
+[sudo]
+style = 'bold green'
+symbol = '👩‍💻 '
+disabled = false
+
+[kubernetes]
+disabled = false
+format = 'on [$symbol$context( \($namespace\))]($style) '
+
+[[kubernetes.contexts]]
+context_pattern = "dev.local.cluster.k8s"
+context_alias = "dev"
+
+[[kubernetes.contexts]]
+context_pattern = ".*/openshift-cluster/.*"
+context_alias = "openshift"
+
+[[kubernetes.contexts]]
+context_pattern = "gke_.*_(?P<cluster>[\\w-]+)"
+context_alias = "gke/$cluster"
+
+[[kubernetes.contexts]]
+context_pattern = "arn:aws:eks:.*/(?P<cluster>[\\w-]+)"
+context_alias = "aws/$cluster"
+
+[[kubernetes.contexts]]
+context_pattern = "aks-(?P<cluster>[\\w-]+)"
+context_alias = "aks/$cluster"
+
+[[kubernetes.contexts]]
+context_pattern = "(?P<cluster>[\\w-]+)/.*/admin"
+context_alias = "ibm/$cluster"
+
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[git_status]
+ahead = "⇡${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+
+[docker_context]
+disabled = true
+
+[character]
+# Note the use of Catppuccin color 'maroon'
+success_symbol = "[[♥](green) ❯](maroon)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](green)"
+
+[directory]
+truncation_length = 4
+# Catppuccin 'lavender'
+style = "bold lavender"
+
+# palette tables should be last in the config ⚓️
+[palettes.catppuccin_macchiato]
+rosewater = "#f4dbd6"
+flamingo = "#f0c6c6"
+pink = "#f5bde6"
+mauve = "#c6a0f6"
+red = "#ed8796"
+maroon = "#ee99a0"
+peach = "#f5a97f"
+yellow = "#eed49f"
+green = "#a6da95"
+teal = "#8bd5ca"
+sky = "#91d7e3"
+sapphire = "#7dc4e4"
+blue = "#8aadf4"
+lavender = "#b7bdf8"
+text = "#cad3f5"
+subtext1 = "#b8c0e0"
+subtext0 = "#a5adcb"
+overlay2 = "#939ab7"
+overlay1 = "#8087a2"
+overlay0 = "#6e738d"
+surface2 = "#5b6078"
+surface1 = "#494d64"
+surface0 = "#363a4f"
+base = "#24273a"
+mantle = "#1e2030"
+crust = "#181926"

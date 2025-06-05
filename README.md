@@ -1,6 +1,6 @@
 # Git Worktree Manager 🌿
 
-> Professional git worktree management for parallel development workflows
+> Professional git worktree management for parallel development workflows with modern Fish shell setup
 
 **Author:** [@r0derik](https://x.com/r0derik) on X
 
@@ -33,11 +33,95 @@ Git Worktree Manager (`wt`) is a comprehensive Fish shell function for managing 
 - ⌨️ **Tab Completion** - Full Fish shell completion support for all commands
 - 🛡️ **Safety First** - Confirmation prompts and comprehensive validation
 
+## 🐟 Fish Shell Setup
+
+Not using Fish shell yet? Get a modern terminal experience with our automated setup script that installs Fish shell and configures it with powerful tools for development.
+
+### Quick Install (One-liner)
+
+```bash
+# Download and run the Fish setup (fetches configs from GitHub)
+curl -sL https://raw.githubusercontent.com/roderik/wt/main/setup-fish.sh | bash
+```
+
+This will download all configurations directly from the GitHub repository and set up your Fish shell environment.
+
+### What Gets Installed
+
+ The setup script installs and configures:
+
+#### 🐚 **Fish Shell**
+- **Why:** User-friendly interactive shell with powerful features like autosuggestions, web-based configuration, and excellent tab completion
+- **What:** Smart command-line shell that's easier to use than bash/zsh
+
+#### ⭐ **Starship Prompt**
+- **Why:** Fast, customizable, and intelligent prompt that shows relevant information about your current directory
+- **What:** Cross-shell prompt with git status, package versions, execution time, and more
+- **Config:** Beautiful Catppuccin Macchiato theme pre-configured
+
+#### 🛠️ **Modern CLI Tools**
+- **bat** - `cat` with syntax highlighting and Git integration
+- **eza** - Modern `ls` replacement with icons and git status
+- **ripgrep** - Ultra-fast text search (better than `grep`)
+- **fd** - User-friendly `find` alternative
+- **fzf** - Fuzzy finder for files, command history, and more
+- **lazygit** - Terminal UI for git commands
+- **lazydocker** - Terminal UI for docker management
+- **fnm** - Fast Node.js version manager
+- **git-delta** - Beautiful git diffs with syntax highlighting
+- **hexyl** - Hex viewer with colored output
+- **procs** - Modern `ps` replacement
+- **broot** - Interactive tree view with search
+
+#### 🎯 **Smart Aliases**
+Pre-configured aliases for common tasks:
+- `ls`, `ll`, `la` → Enhanced directory listings with eza
+- `g` → git shorthand
+- `gcm` → git commit -m
+- `lzg` → lazygit
+- `lzd` → lazydocker
+- `ff` → fzf with file preview
+
+### Manual Setup
+
+If you prefer to set things up manually:
+
+```bash
+# Clone the repository
+git clone https://github.com/roderik/wt.git
+cd wt
+git checkout fishsetup
+
+# Run the setup script
+./setup-fish.sh
+
+# Change your default shell to Fish
+chsh -s $(which fish)
+```
+
+### What the Setup Does
+
+1. **Installs Homebrew** (if not present) - macOS package manager
+2. **Installs Fish shell** and adds it to allowed shells
+3. **Installs modern development tools** via Homebrew
+4. **Configures Fish** with aliases, completions, and environment setup
+5. **Configures Starship** with a beautiful, informative prompt
+6. **Installs wt** (this git worktree manager) if present
+
+The script is idempotent - you can run it multiple times to update your setup.
+
+### Configuration Files
+
+The setup creates:
+- `~/.config/fish/config.fish` - Fish shell configuration
+- `~/.config/starship.toml` - Starship prompt theme
+- `~/.config/fish/functions/wt.fish` - Git worktree manager (if installed)
+
 ## Installation
 
 ### Prerequisites
 
-- [Fish Shell](https://fishshell.com/) 4.0+
+- [Fish Shell](https://fishshell.com/) 4.0+ (or use our setup script above)
 - [Git](https://git-scm.com/) 2.5+ (with worktree support)
 - At least one package manager: [Bun](https://bun.sh/), NPM, [Yarn](https://yarnpkg.com/), or [PNPM](https://pnpm.io/)
 
