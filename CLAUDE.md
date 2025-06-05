@@ -81,3 +81,4 @@ Always use `_wt_get_repo_root` to find repository root, as it handles:
 2. Use test framework assertions (`assert_success`, `assert_equal`, etc.)
 3. Add integration test scenarios if needed
 4. Run `./run_tests.fish` to verify
+
