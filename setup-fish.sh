@@ -54,12 +54,16 @@ TOOLS=(
     "git-delta" # Better git diff
     "procs"     # Better ps
     "broot"     # Better tree
+    "nvim"      # Neovim
     "eza"       # Better ls (exa replacement)
     "fnm"       # Fast Node.js version manager
     "1password-cli" # 1Password CLI
     "lazygit"   # Terminal UI for git
     "lazydocker" # Terminal UI for docker
     "fzf"       # Fuzzy finder
+    "direnv"    # Per-project environment variables
+    "zoxide"    # Smarter cd command
+    "atuin"     # Better shell history
 )
 
 for tool in "${TOOLS[@]}"; do
@@ -167,6 +171,9 @@ echo "  • fzf       - Fuzzy finder"
 echo "  • lazygit   - Terminal UI for git"
 echo "  • lazydocker - Terminal UI for docker"
 echo "  • fnm       - Fast Node.js version manager"
+echo "  • direnv    - Per-project environment variables"
+echo "  • zoxide    - Smarter cd command (z/zi)"
+echo "  • atuin     - Better shell history with sync"
 echo "  • And more!"
 echo ""
 echo -e "${BLUE}Configuration files installed:${NC}"
