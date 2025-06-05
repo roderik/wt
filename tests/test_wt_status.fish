@@ -87,13 +87,26 @@ end
 function test_wt_status_clean_repo
     test_case "wt status - clean repository"
 
-    cd $TEST_TEMP_DIR/test_repo
+    # Create a fresh test repo to ensure clean state
+    set clean_repo (mktemp -d)
+    cd $clean_repo
+    git init --quiet
+    git config user.email "test@example.com"
+    git config user.name "Test User"
+    echo "# Clean Repo" >README.md
+    git add README.md
+    git commit -m "Initial commit" --quiet
+
     set output (wt status 2>&1)
     assert_success "Should show status successfully"
 
     assert_contains "$output" "Staged: 0 files" "Should show 0 staged"
     assert_contains "$output" "Modified: 0 files" "Should show 0 modified"
     assert_contains "$output" "Untracked: 0 files" "Should show 0 untracked"
+
+    # Clean up
+    cd $TEST_TEMP_DIR
+    rm -rf $clean_repo
 
     test_pass
 end

@@ -133,7 +133,7 @@ function test_integration_package_manager_detection
 
     # Test with package.json (npm)
     echo '{"name": "test"}' >package.json
-    echo '{"name": "test", "lockfileVersion": 3, "requires": true, "packages": {}}' >package-lock.json
+    touch package-lock.json
     git add package.json package-lock.json
     git commit -m "Add npm project files" --quiet
 
@@ -145,7 +145,7 @@ function test_integration_package_manager_detection
     # Test with yarn
     cd $TEST_TEMP_DIR/test_repo
     rm package-lock.json
-    echo '# yarn lockfile v1' >yarn.lock
+    touch yarn.lock
     git add yarn.lock
     git rm package-lock.json
     git commit -m "Switch to yarn" --quiet
@@ -157,7 +157,7 @@ function test_integration_package_manager_detection
     # Test with pnpm
     cd $TEST_TEMP_DIR/test_repo
     rm yarn.lock
-    echo 'lockfileVersion: "6.0"' >pnpm-lock.yaml
+    touch pnpm-lock.yaml
     git add pnpm-lock.yaml
     git rm yarn.lock
     git commit -m "Switch to pnpm" --quiet
@@ -169,7 +169,7 @@ function test_integration_package_manager_detection
     # Test with bun
     cd $TEST_TEMP_DIR/test_repo
     rm pnpm-lock.yaml
-    echo '{"lockfileVersion": 0, "packages": {}}' >bun.lock
+    touch bun.lock
     git add bun.lock
     git rm pnpm-lock.yaml
     git commit -m "Switch to bun" --quiet
