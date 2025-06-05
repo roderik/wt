@@ -24,14 +24,14 @@ Git Worktree Manager (`wt`) is a comprehensive Fish shell function for managing 
 
 ## Features
 
-✨ **Comprehensive Command Set** - Full lifecycle management with intuitive subcommands
-📦 **Smart Package Manager Detection** - Auto-detects Bun, NPM, Yarn, or PNPM based on lockfiles
-🎯 **Flexible Branch Creation** - Create worktrees from any ref with `--from` option
-🗂️ **Intelligent Organization** - Uses `.worktrees` directory with robust path resolution
-📊 **Rich Status Information** - Detailed worktree status and git information
-🧹 **Granular Cleanup** - Remove individual worktrees or clean all at once
-⌨️ **Tab Completion** - Full Fish shell completion support for all commands
-🛡️ **Safety First** - Confirmation prompts and comprehensive validation
+- ✨ **Comprehensive Command Set** - Full lifecycle management with intuitive subcommands
+- 📦 **Smart Package Manager Detection** - Auto-detects Bun, NPM, Yarn, or PNPM based on lockfiles
+- 🎯 **Flexible Branch Creation** - Create worktrees from any ref with `--from` option
+- 🗂️ **Intelligent Organization** - Uses `.worktrees` directory with robust path resolution
+- 📊 **Rich Status Information** - Detailed worktree status and git information
+- 🧹 **Granular Cleanup** - Remove individual worktrees or clean all at once
+- ⌨️ **Tab Completion** - Full Fish shell completion support for all commands
+- 🛡️ **Safety First** - Confirmation prompts and comprehensive validation
 
 ## Installation
 
@@ -329,6 +329,76 @@ cd $(git rev-parse --show-toplevel) # Go to repo root
 wt status                          # Check current state
 ```
 
+## Testing
+
+The project includes a comprehensive test suite to ensure reliability and prevent regressions.
+
+### Running Tests
+
+```fish
+# Run all tests
+./run_tests.fish
+
+# Run specific test file
+./tests/test_runner.fish tests/test_wt_new.fish
+
+# Run multiple test files
+./tests/test_runner.fish tests/test_wt_new.fish tests/test_wt_switch.fish
+```
+
+### Test Structure
+
+```
+tests/
+├── test_runner.fish      # Test framework with assertions
+├── test_wt_new.fish      # Tests for wt new command
+├── test_wt_switch.fish   # Tests for wt switch command
+├── test_wt_list.fish     # Tests for wt list command
+├── test_wt_remove.fish   # Tests for wt remove command
+├── test_wt_status.fish   # Tests for wt status command
+├── test_wt_clean.fish    # Tests for wt clean command
+├── test_wt_help.fish     # Tests for wt help command
+├── test_utilities.fish   # Tests for utility functions
+└── test_integration.fish # End-to-end workflow tests
+```
+
+### Test Framework Features
+
+The test framework provides:
+- **Setup/Teardown**: Automatic test environment creation and cleanup
+- **Assertions**: `assert_equal`, `assert_contains`, `assert_dir_exists`, etc.
+- **Colored Output**: Green for passed, red for failed tests
+- **Test Summary**: Total passed/failed counts
+- **Isolated Testing**: Each test runs in a temporary git repository
+
+### Writing Tests
+
+```fish
+function test_my_feature
+    test_case "Feature description"
+    
+    # Your test code here
+    wt new test-branch
+    assert_success "Should create worktree"
+    
+    # More assertions
+    assert_dir_exists .worktrees/test-branch
+    assert_branch_exists test-branch
+    
+    test_pass
+end
+```
+
+### CI/CD Integration
+
+The project uses GitHub Actions for continuous integration:
+
+- **Test Matrix**: Tests run on Ubuntu and macOS with multiple Fish versions
+- **Linting**: Fish syntax checking and formatting validation
+- **Installation Tests**: Verifies curl and manual installation methods
+- **Performance Tests**: Monitors operation performance
+- **Security Scans**: Checks for hardcoded secrets and unsafe operations
+
 ## Contributing
 
 This is a GitHub repository! Here's how you can contribute:
@@ -338,6 +408,16 @@ This is a GitHub repository! Here's how you can contribute:
 - **🎯 Submit a Pull Request** with your improvements
 - **🐛 Open an Issue** for bugs or feature requests
 - **📤 Share** the repository with others who might benefit
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch: `wt new feature-your-feature`
+3. Make your changes
+4. Run tests: `./run_tests.fish`
+5. Commit your changes
+6. Push to your fork
+7. Create a Pull Request
 
 ### Reporting Issues
 
