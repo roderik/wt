@@ -102,6 +102,32 @@ function test_wt_switch_lists_available
     test_pass
 end
 
+function test_wt_switch_to_main
+    test_case "wt switch - switch back to main branch"
+
+    cd $TEST_TEMP_DIR/test_repo
+    # Create a worktree
+    wt new feature-branch
+
+    # Verify we're in the worktree
+    set current_dir (pwd)
+    assert_contains $current_dir "/.worktrees/feature-branch" "Should be in worktree"
+
+    # Switch back to main
+    wt switch main
+    assert_success "Should switch to main successfully"
+
+    # Verify we're in the main repository root
+    set current_dir (pwd)
+    assert_equal $TEST_TEMP_DIR/test_repo $current_dir "Should be in main repository"
+
+    # Verify we're on main branch
+    set current_branch (git branch --show-current)
+    assert_equal main $current_branch "Should be on main branch"
+
+    test_pass
+end
+
 # Run all tests
 test_wt_switch_basic
 test_wt_switch_no_args
@@ -109,3 +135,4 @@ test_wt_switch_nonexistent
 test_wt_switch_shows_status
 test_wt_switch_from_worktree
 test_wt_switch_lists_available
+test_wt_switch_to_main

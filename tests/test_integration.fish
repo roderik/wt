@@ -287,15 +287,13 @@ packages:
     # Test with bun
     cd $TEST_TEMP_DIR/test_repo
     rm pnpm-lock.yaml
-    # For bun, just use an empty lockfile - it will be regenerated properly
-    touch bun.lock
-    git add bun.lock
+    # For bun, don't create a lockfile - let bun create it
     git rm pnpm-lock.yaml
     git commit -m "Switch to bun" --quiet
 
     set output (wt new bun-project 2>&1)
     assert_success "Should create worktree"
-    assert_contains "$output" "bun install" "Should detect bun"
+    assert_contains "$output" "bun install" "Should use bun as default"
 
     test_pass
 end

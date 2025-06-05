@@ -49,7 +49,8 @@ function test_setup --description "Set up test environment"
     git config user.email "test@example.com"
     git config user.name "Test User"
     echo "# Test Repository" >README.md
-    git add README.md
+    echo ".worktrees/" >.gitignore
+    git add README.md .gitignore
     git commit -m "Initial commit" --quiet
 end
 
