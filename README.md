@@ -393,7 +393,7 @@ end
 
 The project uses GitHub Actions for continuous integration:
 
-- **Test Matrix**: Tests run on Ubuntu and macOS with multiple Fish versions
+- **Test Matrix**: Tests run on Ubuntu and macOS with Fish 4.0+
 - **Linting**: Fish syntax checking and formatting validation
 - **Installation Tests**: Verifies curl and manual installation methods
 - **Performance Tests**: Monitors operation performance

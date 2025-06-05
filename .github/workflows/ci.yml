@@ -54,7 +54,10 @@ jobs:
 
     - name: Install Fish shell
       run: |
-        sudo apt-add-repository ppa:fish-shell/release-3
+        # Install Fish 4.0 or later
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:fish-shell/nightly-master
         sudo apt-get update
         sudo apt-get install -y fish
 
@@ -104,7 +107,10 @@ jobs:
     - name: Install Fish shell (Ubuntu)
       if: startsWith(matrix.os, 'ubuntu')
       run: |
-        sudo apt-add-repository ppa:fish-shell/release-3
+        # Install Fish 4.0 or later
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:fish-shell/nightly-master
         sudo apt-get update
         sudo apt-get install -y fish
 
@@ -148,7 +154,10 @@ jobs:
     - name: Install Fish shell
       run: |
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-          sudo apt-add-repository ppa:fish-shell/release-3
+          # Install Fish 4.0 or later
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository -y ppa:fish-shell/nightly-master
           sudo apt-get update
           sudo apt-get install -y fish
         else
@@ -195,7 +204,10 @@ jobs:
     - name: Install dependencies
       run: |
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-          sudo apt-add-repository ppa:fish-shell/release-3
+          # Install Fish 4.0 or later
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository -y ppa:fish-shell/nightly-master
           sudo apt-get update
           sudo apt-get install -y fish git
         else
@@ -254,7 +266,10 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-add-repository ppa:fish-shell/release-3
+        # Install Fish 4.0 or later
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:fish-shell/nightly-master
         sudo apt-get update
         sudo apt-get install -y fish time
 
@@ -328,7 +343,10 @@ jobs:
 
     - name: Install Fish
       run: |
-        sudo apt-add-repository ppa:fish-shell/release-3
+        # Install Fish 4.0 or later
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:fish-shell/nightly-master
         sudo apt-get update
         sudo apt-get install -y fish
 
