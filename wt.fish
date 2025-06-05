@@ -2,9 +2,9 @@
 # Professional git worktree management for parallel development workflows
 #
 # INSTALLATION (Recommended):
-# Install as a separate Fish function file from GitHub gist:
+# Install as a separate Fish function file from GitHub repository:
 #
-#   mkdir -p ~/.config/fish/functions && curl -s https://gist.githubusercontent.com/roderik/2e97e8149f632c249631899c8c1d090e/raw/config.fish > ~/.config/fish/functions/wt.fish && source ~/.config/fish/config.fish
+#   mkdir -p ~/.config/fish/functions && curl -s https://raw.githubusercontent.com/roderik/wt/main/wt.fish > ~/.config/fish/functions/wt.fish && source ~/.config/fish/config.fish
 #
 # ALTERNATIVE INSTALLATION:
 # You can also add this function directly to your Fish configuration file,
@@ -26,7 +26,7 @@
 #   wt remove api-fix               # Remove specific worktree
 #   wt status                       # Show current status
 #
-# GIST: https://gist.github.com/roderik/2e97e8149f632c249631899c8c1d090e
+# REPOSITORY: https://github.com/roderik/wt
 
 function wt --description "Git worktree management"
     # Check if we have any arguments
