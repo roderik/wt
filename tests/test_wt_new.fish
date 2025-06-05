@@ -4,6 +4,7 @@
 function test_wt_new_basic
     test_case "wt new - basic branch creation"
 
+    cd $TEST_TEMP_DIR/test_repo
     # Create a new worktree
     wt new feature-test
     assert_success "Should create worktree successfully"
@@ -45,10 +46,12 @@ function test_wt_new_from_ref
     assert_success "Should create worktree from specific commit"
 
     # Verify we don't have the second file
-    assert_failure test -f test2.txt "Should not have file from later commit"
+    test -f test2.txt
+    assert_failure "Should not have file from later commit"
 
     # Verify we have the first file
-    assert_success test -f test.txt "Should have file from specified commit"
+    test -f test.txt
+    assert_success "Should have file from specified commit"
 
     test_pass
 end
