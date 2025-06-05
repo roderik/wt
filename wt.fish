@@ -441,9 +441,16 @@ function _wt_remove --description "Remove specific worktree"
     # Check if we're currently in the worktree we're trying to remove
     set current_dir (pwd)
     if test "$current_dir" = "$worktree_path"
-        echo "Error: Cannot remove the worktree you're currently in"
-        echo "Please switch to another worktree first"
-        return 1
+        echo "⚠️  You are currently in the worktree you want to remove"
+        echo "📍 Switching to main repository first..."
+
+        # Switch to main repository
+        cd $repo_root
+        if test $status -ne 0
+            echo "❌ Failed to switch to main repository"
+            return 1
+        end
+        echo "✅ Switched to main repository"
     end
 
     # Confirm removal
