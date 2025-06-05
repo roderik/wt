@@ -5,7 +5,7 @@
 set -g TEST_PASSED 0
 set -g TEST_FAILED 0
 set -g CURRENT_TEST ""
-set -g TEST_TEMP_DIR ""
+set -gx TEST_TEMP_DIR ""
 
 # Color codes for output
 set -g COLOR_GREEN \e\[32m
@@ -15,8 +15,14 @@ set -g COLOR_RESET \e\[0m
 
 function test_setup --description "Set up test environment"
     # Create temporary directory for tests
-    set -g TEST_TEMP_DIR (mktemp -d)
-    set -g ORIGINAL_PWD (pwd)
+    set -gx TEST_TEMP_DIR (mktemp -d)
+    set -gx ORIGINAL_PWD (pwd)
+
+    # Debug: Ensure TEST_TEMP_DIR is set
+    if test -z "$TEST_TEMP_DIR"
+        echo "ERROR: TEST_TEMP_DIR is not set!"
+        exit 1
+    end
 
     # Find the wt.fish file - check multiple possible locations
     set -l possible_paths \
