@@ -11,7 +11,7 @@
 # but the separate file approach is cleaner and more maintainable.
 #
 # USAGE:
-#   wt new <branch> [--from <ref>]  - Create worktree from ref (default: main)
+#   wt new <branch> [--from <ref>]  - Create worktree from ref (default: main/master)
 #   wt switch <branch>              - Switch to existing worktree
 #   wt list                         - List all worktrees with status
 #   wt clean [--all]                - Clean up worktrees (--all includes non-.worktrees)
@@ -23,7 +23,7 @@
 #   wt --all                        - Launch both editors
 #
 # EXAMPLES:
-#   wt new feature-auth             # Create from main branch
+#   wt new feature-auth             # Create from default branch
 #   wt new hotfix --from v1.0.0     # Create from specific tag
 #   wt switch feature-auth          # Switch to worktree
 #   wt remove api-fix               # Remove specific worktree
@@ -84,7 +84,7 @@ function _wt_help --description "Show wt help information"
     echo "  wt <subcommand> [arguments]"
     echo ""
     echo "SUBCOMMANDS:"
-    echo "  new <branch> [--from <ref>]  Create new worktree from ref (default: main)"
+    echo "  new <branch> [--from <ref>]  Create new worktree from ref (default: main/master)"
     echo "  switch, s <branch>           Switch to existing worktree"
     echo "  list, ls                     List all worktrees with status"
     echo "  clean [--all]                Clean up worktrees (--all includes all)"
@@ -98,7 +98,7 @@ function _wt_help --description "Show wt help information"
     echo "  --all                        Launch both Cursor and Claude"
     echo ""
     echo "EXAMPLES:"
-    echo "  wt new feature-auth          Create from main branch"
+    echo "  wt new feature-auth          Create from default branch"
     echo "  wt new hotfix --from v1.0.0  Create from specific tag"
     echo "  wt switch feature-auth       Switch to worktree"
     echo "  wt switch main               Switch back to main branch"
@@ -156,7 +156,16 @@ function _wt_new --description "Create new worktree"
     end
 
     set branch_name $argv[1]
-    set from_ref main
+
+    # Determine the default branch - check for main first, then master
+    if git show-ref --verify --quiet refs/heads/main
+        set from_ref main
+    else if git show-ref --verify --quiet refs/heads/master
+        set from_ref master
+    else
+        # Fallback to current HEAD
+        set from_ref HEAD
+    end
 
     # Parse optional --from argument
     set i 2
@@ -297,21 +306,25 @@ function _wt_switch --description "Switch to existing worktree"
         return 1
     end
 
-    # Special handling for main branch
-    if test "$branch_name" = main
+    # Special handling for default branches (main/master)
+    if test "$branch_name" = main -o "$branch_name" = master
         cd $repo_root
-        # Ensure we checkout main branch
-        git checkout main --quiet
-        echo "✅ Switched to main repository"
-        echo "📁 Location: "(pwd)
-        echo "🌿 Branch: "(git branch --show-current)
+        # Try to checkout the requested branch
+        if git checkout $branch_name --quiet 2>/dev/null
+            echo "✅ Switched to main repository"
+            echo "📁 Location: "(pwd)
+            echo "🌿 Branch: "(git branch --show-current)
 
-        # Show brief status
-        set modified_count (git status --porcelain | wc -l | string trim)
-        if test $modified_count -gt 0
-            echo "📝 Modified files: $modified_count"
+            # Show brief status
+            set modified_count (git status --porcelain | wc -l | string trim)
+            if test $modified_count -gt 0
+                echo "📝 Modified files: $modified_count"
+            end
+            return 0
+        else
+            echo "Error: Branch '$branch_name' does not exist in main repository"
+            return 1
         end
-        return 0
     end
 
     set worktree_path "$repo_root/.worktrees/$branch_name"

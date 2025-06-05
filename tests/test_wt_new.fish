@@ -165,10 +165,13 @@ function test_wt_new_creates_worktrees_dir
 end
 
 function test_wt_new_default_from_main
-    test_case "wt new - defaults to creating from main branch"
+    test_case "wt new - defaults to creating from default branch"
 
     cd $TEST_TEMP_DIR/test_repo
-    # Create a commit on main
+    # Get the default branch name
+    set default_branch (git branch --show-current)
+
+    # Create a commit on default branch
     echo "main content" >main.txt
     git add main.txt
     git commit -m "Main commit" --quiet
@@ -180,20 +183,20 @@ function test_wt_new_default_from_main
     git add other.txt
     git commit -m "Other commit" --quiet
 
-    # Create worktree while on other-branch (should still use main)
+    # Create worktree while on other-branch (should still use default branch)
     wt new feature-default
-    assert_success "Should create worktree from main"
+    assert_success "Should create worktree from default branch"
 
-    # Verify we have the file from main
-    assert_success test -f main.txt "Should have file from main branch"
+    # Verify we have the file from default branch
+    assert_success test -f main.txt "Should have file from default branch"
 
     # Verify we don't have the file from other-branch
     test -f other.txt
     assert_failure "Should not have file from other branch"
 
-    # Verify the worktree is based on main's commit
+    # Verify the worktree is based on default branch's commit
     set worktree_commit (git rev-parse HEAD)
-    assert_equal $main_commit $worktree_commit "Should be based on main commit"
+    assert_equal $main_commit $worktree_commit "Should be based on default branch commit"
 
     test_pass
 end
