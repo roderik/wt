@@ -81,7 +81,8 @@ function test_integration_parallel_development
     wt new hotfix --from $main_commit
     assert_success "Should create hotfix from specific commit"
     # Verify the pre-hotfix file doesn't exist
-    assert_failure test -f pre-hotfix.txt "Should not have later changes"
+    test -f pre-hotfix.txt
+    assert_failure "Should not have later changes"
 
     # List to see all parallel work
     cd $TEST_TEMP_DIR/test_repo
@@ -131,6 +132,8 @@ function test_integration_package_manager_detection
     # Test with package.json (npm)
     echo '{"name": "test"}' >package.json
     echo lockfile >package-lock.json
+    git add package.json package-lock.json
+    git commit -m "Add npm project files" --quiet
 
     # Capture output to check for npm install
     set output (wt new npm-project 2>&1)
@@ -141,6 +144,9 @@ function test_integration_package_manager_detection
     cd $TEST_TEMP_DIR/test_repo
     rm package-lock.json
     echo lockfile >yarn.lock
+    git add yarn.lock
+    git rm package-lock.json
+    git commit -m "Switch to yarn" --quiet
 
     set output (wt new yarn-project 2>&1)
     assert_success "Should create worktree"
@@ -150,6 +156,9 @@ function test_integration_package_manager_detection
     cd $TEST_TEMP_DIR/test_repo
     rm yarn.lock
     echo lockfile >pnpm-lock.yaml
+    git add pnpm-lock.yaml
+    git rm yarn.lock
+    git commit -m "Switch to pnpm" --quiet
 
     set output (wt new pnpm-project 2>&1)
     assert_success "Should create worktree"
@@ -159,6 +168,9 @@ function test_integration_package_manager_detection
     cd $TEST_TEMP_DIR/test_repo
     rm pnpm-lock.yaml
     echo lockfile >bun.lockb
+    git add bun.lockb
+    git rm pnpm-lock.yaml
+    git commit -m "Switch to bun" --quiet
 
     set output (wt new bun-project 2>&1)
     assert_success "Should create worktree"
