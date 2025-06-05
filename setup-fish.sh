@@ -75,6 +75,15 @@ for tool in "${TOOLS[@]}"; do
     fi
 done
 
+# Start atuin service
+echo -e "${YELLOW}🚀 Starting atuin service...${NC}"
+if "$BREW_PATH" services list | grep -q "atuin.*started"; then
+    echo -e "${GREEN}✓ atuin service is already running${NC}"
+else
+    "$BREW_PATH" services start atuin
+    echo -e "${GREEN}✓ atuin service started${NC}"
+fi
+
 # Add Fish to allowed shells
 echo -e "${YELLOW}🐟 Configuring Fish shell...${NC}"
 if grep -q "$FISH_PATH" /etc/shells; then
@@ -91,7 +100,7 @@ mkdir -p ~/.config/fish
 mkdir -p ~/.config/starship
 
 # Detect if running from local directory or curl
-if [[ -n "${BASH_SOURCE[0]}" ]] && [[ -f "$(dirname "${BASH_SOURCE[0]}")/config/fish/config.fish" ]]; then
+if [[ -n "${BASH_SOURCE[0]:-}" ]] && [[ -f "$(dirname "${BASH_SOURCE[0]:-}")/config/fish/config.fish" ]]; then
     # Local installation
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     echo -e "${YELLOW}📁 Local installation detected${NC}"

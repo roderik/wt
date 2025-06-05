@@ -116,7 +116,7 @@ if status is-interactive
 
     # Modern Fish abbreviations (expand on space)
     # Git abbreviations
-    abbr --add g 'git'
+    abbr --add g git
     abbr --add ga 'git add'
     abbr --add gaa 'git add --all'
     abbr --add gap 'git add --patch'
@@ -167,12 +167,12 @@ if status is-interactive
     abbr --add ..... 'cd ../../../..'
 
     # Docker abbreviations
-    abbr --add d 'docker'
+    abbr --add d docker
     abbr --add dc 'docker compose'
-    abbr --add lzd 'lazydocker'
+    abbr --add lzd lazydocker
 
     # Other tool abbreviations
-    abbr --add lzg 'lazygit'
+    abbr --add lzg lazygit
 
     # Additional git abbreviation
     abbr --add gcad 'git commit --all --amend'
@@ -215,7 +215,7 @@ end
 if command -q zoxide
     zoxide init fish | source
     alias cd='z'
-    alias cdi='zi'  # interactive selection
+    alias cdi='zi' # interactive selection
 end
 
 # atuin - Better shell history
