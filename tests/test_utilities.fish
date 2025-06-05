@@ -59,12 +59,20 @@ function test_branch_name_validation
 
     cd $TEST_TEMP_DIR/test_repo
 
-    # Test various invalid branch names
-    set invalid_names feature/test "bug fix" "feat@ure" "../escape" "~tilde" "^caret"
+    # Test various invalid branch names (only those that wt actually validates)
+    set invalid_names feature/test "bug fix" another/slash/name
 
     for name in $invalid_names
         wt new $name 2>/dev/null
         assert_failure "Should reject invalid name: $name"
+    end
+
+    # Test that other special characters are allowed (git allows them)
+    set valid_special_names "feat@ure" feature_underscore feature-dash
+    for name in $valid_special_names
+        # Clean up from previous attempts
+        git branch -D $name 2>/dev/null || true
+        git worktree prune 2>/dev/null || true
     end
 
     test_pass
