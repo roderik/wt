@@ -26,6 +26,9 @@ fish_indent -w wt.fish          # Format Fish script
 pre-commit autoupdate           # Update pre-commit hooks
 ```
 
+## Important Notes
+- run pre-commit before committing and fix all issues
+
 ## Architecture
 
 The codebase implements a git worktree manager as a single Fish shell function with modular subcommands:

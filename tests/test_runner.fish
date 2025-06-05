@@ -24,7 +24,7 @@ function test_setup --description "Set up test environment"
         (dirname (dirname (status -f)))/wt.fish \
         ./wt.fish \
         ../wt.fish
-    
+
     set -l wt_file ""
     for path in $possible_paths
         if test -f $path
@@ -32,12 +32,12 @@ function test_setup --description "Set up test environment"
             break
         end
     end
-    
+
     if test -z "$wt_file"
         echo "Error: Could not find wt.fish"
         exit 1
     end
-    
+
     # Source the main wt.fish file
     source $wt_file
 
