@@ -376,15 +376,15 @@ The test framework provides:
 ```fish
 function test_my_feature
     test_case "Feature description"
-    
+
     # Your test code here
     wt new test-branch
     assert_success "Should create worktree"
-    
+
     # More assertions
     assert_dir_exists .worktrees/test-branch
     assert_branch_exists test-branch
-    
+
     test_pass
 end
 ```

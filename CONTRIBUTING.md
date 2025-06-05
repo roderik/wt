@@ -73,14 +73,14 @@ Example test:
 ```fish
 function test_my_new_feature
     test_case "My feature description"
-    
+
     # Test setup
     wt new test-branch
-    
+
     # Assertions
     assert_success "Should succeed"
     assert_dir_exists .worktrees/test-branch
-    
+
     test_pass
 end
 ```
