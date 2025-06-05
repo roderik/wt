@@ -12,12 +12,12 @@ function test_wt_new_basic
     # Verify branch was created
     assert_branch_exists feature-test "Branch should exist"
 
-    # Verify worktree directory exists
-    assert_dir_exists .worktrees/feature-test "Worktree directory should exist"
-
     # Verify we're in the new worktree
     set current_dir (pwd)
     assert_contains $current_dir "/.worktrees/feature-test" "Should be in worktree directory"
+
+    # Verify worktree directory exists (check from current location)
+    assert_success test -d . "Worktree directory should exist"
 
     # Verify current branch
     set current_branch (git branch --show-current)

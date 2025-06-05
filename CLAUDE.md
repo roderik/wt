@@ -28,6 +28,7 @@ pre-commit autoupdate           # Update pre-commit hooks
 
 ## Important Notes
 - run pre-commit before committing and fix all issues
+- always run pre-commit and the tests before committing, they should all pass
 
 ## Architecture
 

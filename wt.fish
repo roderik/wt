@@ -18,6 +18,9 @@
 #   wt remove <branch>              - Remove specific worktree
 #   wt status                       - Show current worktree status
 #   wt help                         - Show detailed help
+#   wt --claude                     - Launch Claude Code editor
+#   wt --cursor                     - Launch Cursor editor
+#   wt --all                        - Launch both editors
 #
 # EXAMPLES:
 #   wt new feature-auth             # Create from main branch
@@ -53,6 +56,20 @@ function wt --description "Git worktree management"
             _wt_status
         case help h
             _wt_help
+        case --claude
+            # Launch Claude with dangerously skip permissions
+            echo "Launching Claude Code..."
+            claude --dangerously-skip-permissions
+        case --cursor
+            # Launch Cursor in current directory
+            echo "Launching Cursor..."
+            cursor .
+        case --all
+            # Launch both editors - Cursor first (UI), then Claude (terminal)
+            echo "Launching Cursor..."
+            cursor .
+            echo "Launching Claude Code..."
+            claude --dangerously-skip-permissions
         case '*'
             echo "Error: Unknown subcommand '$subcommand'"
             echo "Run 'wt help' for usage information"
@@ -75,6 +92,11 @@ function _wt_help --description "Show wt help information"
     echo "  status, st                   Show current worktree status"
     echo "  help, h                      Show this help message"
     echo ""
+    echo "EDITOR OPTIONS:"
+    echo "  --claude                     Launch Claude Code (with --dangerously-skip-permissions)"
+    echo "  --cursor                     Launch Cursor in current directory"
+    echo "  --all                        Launch both Cursor and Claude"
+    echo ""
     echo "EXAMPLES:"
     echo "  wt new feature-auth          Create from main branch"
     echo "  wt new hotfix --from v1.0.0  Create from specific tag"
@@ -82,6 +104,9 @@ function _wt_help --description "Show wt help information"
     echo "  wt switch main               Switch back to main branch"
     echo "  wt remove api-fix            Remove specific worktree"
     echo "  wt status                    Show current status"
+    echo "  wt --claude                  Launch Claude Code editor"
+    echo "  wt --cursor                  Launch Cursor editor"
+    echo "  wt --all                     Launch both editors"
     echo ""
     echo "TIPS:"
     echo "  • Worktrees are created in .worktrees/ directory"
@@ -348,7 +373,10 @@ function _wt_list --description "List all git worktrees"
                 end
 
                 # Format the output
-                if string match -q "*/.worktrees/*" $current_path
+                # Get repository root to check if this is a worktree
+                set repo_root (_wt_get_repo_root)
+                # Check if this path is under repo_root/.worktrees/
+                if string match -q "$repo_root/.worktrees/*" $current_path
                     set display_path (basename $current_path)
                     echo -n "🌿 $current_branch"
                 else
@@ -385,7 +413,15 @@ function _wt_status --description "Show current worktree status"
     echo "🌿 Branch: $current_branch"
 
     # Check if we're in a worktree or main repo
-    if string match -q "*/.worktrees/*" $current_dir
+    # Get repository root to check if this is a worktree
+    set repo_root (_wt_get_repo_root)
+    if test $status -ne 0
+        echo "Error: Could not determine repository root"
+        return 1
+    end
+
+    # Check if current directory is under repo_root/.worktrees/
+    if string match -q "$repo_root/.worktrees/*" $current_dir
         echo "📍 Type: Worktree"
     else
         echo "📍 Type: Main repository"
@@ -448,9 +484,16 @@ function _wt_remove --description "Remove specific worktree"
     # Check if we're currently in the worktree we're trying to remove
     set current_dir (pwd)
     if test "$current_dir" = "$worktree_path"
-        echo "Error: Cannot remove the worktree you're currently in"
-        echo "Please switch to another worktree first"
-        return 1
+        echo "⚠️  You are currently in the worktree you want to remove"
+        echo "📍 Switching to main repository first..."
+
+        # Switch to main repository
+        cd $repo_root
+        if test $status -ne 0
+            echo "❌ Failed to switch to main repository"
+            return 1
+        end
+        echo "✅ Switched to main repository"
     end
 
     # Confirm removal
@@ -522,8 +565,10 @@ function _wt_clean --description "Clean up all git worktrees"
                     set worktrees_to_remove $worktrees_to_remove $current_worktree
                 end
             else
-                # Only include worktrees in .worktrees directory
-                if string match -q "*/.worktrees/*" $current_worktree
+                # Only include worktrees in .worktrees directory of the current repo
+                # Check if the worktree is under repo_root/.worktrees/
+                set worktrees_dir "$repo_root/.worktrees"
+                if string match -q "$worktrees_dir/*" $current_worktree
                     set worktrees_to_remove $worktrees_to_remove $current_worktree
                 end
             end
@@ -579,13 +624,16 @@ end
 
 # Add completion support
 complete -c wt -f
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a new -d "Create new worktree"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "switch s" -d "Switch to worktree"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "list ls" -d "List worktrees"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a clean -d "Clean up worktrees"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "remove rm" -d "Remove worktree"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "status st" -d "Show status"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "help h" -d "Show help"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a new -d "Create new worktree"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "switch s" -d "Switch to worktree"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "list ls" -d "List worktrees"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a clean -d "Clean up worktrees"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "remove rm" -d "Remove worktree"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "status st" -d "Show status"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a "help h" -d "Show help"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a --claude -d "Launch Claude Code"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a --cursor -d "Launch Cursor"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h --claude --cursor --all" -a --all -d "Launch both editors"
 
 # Complete branch names for switch and remove commands
 complete -c wt -n "__fish_seen_subcommand_from switch s remove rm" -a "(git branch --format='%(refname:short)')"

@@ -62,14 +62,21 @@ function test_wt_remove_nonexistent
 end
 
 function test_wt_remove_current_worktree
-    test_case "wt remove - cannot remove current worktree"
+    test_case "wt remove - can remove current worktree by switching to main"
 
     cd $TEST_TEMP_DIR/test_repo
     wt new feature-current-remove
     # We're now in the worktree
 
-    wt remove feature-current-remove 2>/dev/null
-    assert_failure "Should fail when removing current worktree"
+    # Should switch to main and remove
+    echo y | wt remove feature-current-remove
+    assert_success "Should succeed by switching to main first"
+
+    # Should now be in main repository
+    assert_equal (pwd) "$TEST_TEMP_DIR/test_repo" "Should be in main repository"
+
+    # Verify worktree is gone
+    assert_dir_not_exists .worktrees/feature-current-remove "Worktree should be removed"
 
     test_pass
 end
@@ -108,6 +115,27 @@ function test_wt_remove_cancel_branch_deletion
     test_pass
 end
 
+function test_wt_remove_current_worktree_with_branch_deletion
+    test_case "wt remove - remove current worktree and delete branch"
+
+    cd $TEST_TEMP_DIR/test_repo
+    wt new feature-current-remove-branch
+    # We're now in the worktree
+
+    # Should switch to main and remove both worktree and branch
+    printf "y\ny\n" | wt remove feature-current-remove-branch
+    assert_success "Should succeed by switching to main first"
+
+    # Should now be in main repository
+    assert_equal (pwd) "$TEST_TEMP_DIR/test_repo" "Should be in main repository"
+
+    # Verify both worktree and branch are gone
+    assert_dir_not_exists .worktrees/feature-current-remove-branch "Worktree should be removed"
+    assert_branch_not_exists feature-current-remove-branch "Branch should be deleted"
+
+    test_pass
+end
+
 function test_wt_remove_outside_repo
     test_case "wt remove - outside git repo"
 
@@ -131,4 +159,5 @@ test_wt_remove_nonexistent
 test_wt_remove_current_worktree
 test_wt_remove_cancel
 test_wt_remove_cancel_branch_deletion
+test_wt_remove_current_worktree_with_branch_deletion
 test_wt_remove_outside_repo
