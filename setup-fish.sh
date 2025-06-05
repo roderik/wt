@@ -179,6 +179,6 @@ echo ""
 echo -e "${BLUE}Configuration files installed:${NC}"
 echo "  • ~/.config/fish/config.fish"
 echo "  • ~/.config/starship.toml"
-if [[ -f "$SCRIPT_DIR/wt.fish" ]]; then
+if [[ -f ~/.config/fish/functions/wt.fish ]]; then
     echo "  • ~/.config/fish/functions/wt.fish"
 fi
