@@ -64,21 +64,31 @@ jobs:
     - name: Check Fish syntax
       run: |
         echo "Checking Fish syntax..."
-        for file in wt.fish tests/*.fish run_tests.fish; do
-          echo "Checking $file"
-          fish -n "$file"
+        for file in wt.fish tests/*.fish run_tests.fish setup-dev.fish; do
+          if [ -f "$file" ]; then
+            echo "Checking $file"
+            fish -n "$file"
+          fi
         done
 
     - name: Check Fish formatting
       run: |
         echo "Checking Fish formatting..."
-        for file in wt.fish tests/*.fish run_tests.fish; do
-          echo "Checking $file"
-          if ! fish_indent --check "$file"; then
-            echo "File $file needs formatting. Run: fish_indent -w $file"
-            exit 1
+        for file in wt.fish tests/*.fish run_tests.fish setup-dev.fish; do
+          if [ -f "$file" ]; then
+            echo "Checking $file"
+            if ! fish_indent --check "$file"; then
+              echo "File $file needs formatting. Run: fish_indent -w $file"
+              echo "Or run: ./setup-dev.fish && pre-commit run --all-files"
+              exit 1
+            fi
           fi
         done
+
+    - name: Run pre-commit checks
+      uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files
 
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master

@@ -413,11 +413,14 @@ This is a GitHub repository! Here's how you can contribute:
 
 1. Fork the repository
 2. Create a feature branch: `wt new feature-your-feature`
-3. Make your changes
-4. Run tests: `./run_tests.fish`
-5. Commit your changes
-6. Push to your fork
-7. Create a Pull Request
+3. Set up development environment: `./setup-dev.fish`
+4. Make your changes
+5. Run tests: `./run_tests.fish`
+6. Commit your changes (pre-commit hooks will auto-format)
+7. Push to your fork
+8. Create a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 
 ### Reporting Issues
 

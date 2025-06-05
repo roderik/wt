@@ -1,0 +1,47 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  - repo: local
+    hooks:
+      - id: fish-indent
+        name: Format Fish scripts
+        entry: fish_indent
+        language: system
+        types: [fish]
+        args: ['-w']
+        description: Format Fish shell scripts using fish_indent
+
+      - id: fish-syntax
+        name: Check Fish syntax
+        entry: fish
+        language: system
+        types: [fish]
+        args: ['-n']
+        description: Check Fish shell scripts for syntax errors
+
+      - id: fish-test-syntax
+        name: Check test files syntax
+        entry: fish
+        language: system
+        files: '^tests/.*\.fish$'
+        args: ['-n']
+        description: Check Fish test files for syntax errors
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        files: '\.(sh|bash)$'
+        args: ['--severity=warning']

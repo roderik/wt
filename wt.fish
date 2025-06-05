@@ -135,7 +135,7 @@ function _wt_new --description "Create new worktree"
     # Parse optional --from argument
     set i 2
     while test $i -le (count $argv)
-        if test "$argv[$i]" = "--from"
+        if test "$argv[$i]" = --from
             set i (math $i + 1)
             if test $i -le (count $argv)
                 set from_ref $argv[$i]
@@ -334,7 +334,7 @@ function _wt_list --description "List all git worktrees"
                     set display_path (basename $current_path)
                     echo -n "🌿 $current_branch"
                 else
-                    set display_path "main"
+                    set display_path main
                     echo -n "🏠 $current_branch"
                 end
 
@@ -442,13 +442,13 @@ function _wt_remove --description "Remove specific worktree"
 
     read -l -P "Remove this worktree? [y/N]: " confirmation
 
-    if test "$confirmation" = "y"; or test "$confirmation" = "Y"
+    if test "$confirmation" = y; or test "$confirmation" = Y
         if git worktree remove $worktree_path --force
             echo "✅ Successfully removed worktree: $branch_name"
 
             # Ask if they want to delete the branch too
             read -l -P "Also delete the branch '$branch_name'? [y/N]: " delete_branch
-            if test "$delete_branch" = "y"; or test "$delete_branch" = "Y"
+            if test "$delete_branch" = y; or test "$delete_branch" = Y
                 if git branch -D $branch_name
                     echo "✅ Successfully deleted branch: $branch_name"
                 else
@@ -523,7 +523,7 @@ function _wt_clean --description "Clean up all git worktrees"
     # Confirm before deletion
     read -l -P "Remove all these worktrees? [y/N]: " confirmation
 
-    if test "$confirmation" = "y"; or test "$confirmation" = "Y"
+    if test "$confirmation" = y; or test "$confirmation" = Y
         set removed_count 0
         set failed_count 0
 
@@ -556,10 +556,10 @@ end
 
 # Add completion support
 complete -c wt -f
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "new" -d "Create new worktree"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a new -d "Create new worktree"
 complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "switch s" -d "Switch to worktree"
 complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "list ls" -d "List worktrees"
-complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "clean" -d "Clean up worktrees"
+complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a clean -d "Clean up worktrees"
 complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "remove rm" -d "Remove worktree"
 complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "status st" -d "Show status"
 complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean remove rm status st help h" -a "help h" -d "Show help"
@@ -568,4 +568,3 @@ complete -c wt -n "not __fish_seen_subcommand_from new switch s list ls clean re
 complete -c wt -n "__fish_seen_subcommand_from switch s remove rm" -a "(git branch --format='%(refname:short)')"
 complete -c wt -n "__fish_seen_subcommand_from new" -l from -d "Create from specific ref"
 complete -c wt -n "__fish_seen_subcommand_from clean" -l all -d "Include all worktrees"
-

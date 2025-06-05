@@ -17,17 +17,17 @@ function test_setup --description "Set up test environment"
     # Create temporary directory for tests
     set -g TEST_TEMP_DIR (mktemp -d)
     set -g ORIGINAL_PWD (pwd)
-    
+
     # Source the main wt.fish file
     source (dirname (status -f))/../wt.fish
-    
+
     # Initialize test git repo
     cd $TEST_TEMP_DIR
     git init --quiet test_repo
     cd test_repo
     git config user.email "test@example.com"
     git config user.name "Test User"
-    echo "# Test Repository" > README.md
+    echo "# Test Repository" >README.md
     git add README.md
     git commit -m "Initial commit" --quiet
 end
@@ -183,7 +183,7 @@ function test_summary --description "Print test summary"
     echo "  $COLOR_RED✗ Failed: $TEST_FAILED$COLOR_RESET"
     echo "  Total: "(math $TEST_PASSED + $TEST_FAILED)
     echo "================================"
-    
+
     if test $TEST_FAILED -gt 0
         return 1
     else
