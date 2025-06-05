@@ -7,13 +7,11 @@
 [![Fish Shell](https://img.shields.io/badge/Fish_Shell-4.0+-blue.svg)](https://fishshell.com/)
 [![Git](https://img.shields.io/badge/Git-2.5+-red.svg)](https://git-scm.com/)
 [![Multi Package Manager](https://img.shields.io/badge/Package_Manager-Bun|NPM|Yarn|PNPM-orange.svg)](https://bun.sh/)
-[![Gist](https://img.shields.io/badge/GitHub-Gist-black.svg)](https://gist.github.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black.svg)](https://github.com/roderik/wt)
 
 ## Overview
 
 Git Worktree Manager (`wt`) is a comprehensive Fish shell function for managing git worktrees with intelligent dependency management. Perfect for parallel development, feature isolation, and testing multiple approaches simultaneously without context switching.
-
-**Inspired by the [X post](https://x.com/kieranklaassen/status/1930040623643668552) by [Kieran Klaassen](https://x.com/kieranklaassen)**
 
 ### Why Git Worktrees?
 
@@ -49,7 +47,7 @@ Install as a separate Fish function file for better organization:
 
 ```fish
 # One-liner installation
-mkdir -p ~/.config/fish/functions && curl -s https://gist.githubusercontent.com/roderik/2e97e8149f632c249631899c8c1d090e/raw/config.fish > ~/.config/fish/functions/wt.fish && source ~/.config/fish/config.fish
+mkdir -p ~/.config/fish/functions && curl -s https://raw.githubusercontent.com/roderik/wt/main/wt.fish > ~/.config/fish/functions/wt.fish && source ~/.config/fish/config.fish
 
 # Verify installation
 wt help
@@ -61,7 +59,7 @@ Add directly to your Fish config:
 
 ```fish
 # Download and add to your Fish config
-curl -s https://gist.githubusercontent.com/roderik/2e97e8149f632c249631899c8c1d090e/raw >> ~/.config/fish/config.fish
+curl -s https://raw.githubusercontent.com/roderik/wt/main/wt.fish >> ~/.config/fish/config.fish
 
 # Reload your config
 source ~/.config/fish/config.fish
@@ -333,16 +331,17 @@ wt status                          # Check current state
 
 ## Contributing
 
-This is a GitHub Gist! Here's how you can contribute:
+This is a GitHub repository! Here's how you can contribute:
 
-- **🌟 Star this gist** if you find it useful
-- **🍴 Fork this gist** to create your own version
-- **💬 Comment below** with suggestions, improvements, or issues
-- **📤 Share** the gist with others who might benefit
+- **🌟 Star this repository** if you find it useful
+- **🍴 Fork this repository** to create your own version
+- **🎯 Submit a Pull Request** with your improvements
+- **🐛 Open an Issue** for bugs or feature requests
+- **📤 Share** the repository with others who might benefit
 
 ### Reporting Issues
 
-Please leave a comment on this gist with:
+Please open an issue on the repository with:
 - Fish shell version (`fish --version`)
 - Git version (`git --version`)
 - Package manager versions (e.g., `bun --version`)
@@ -368,12 +367,12 @@ Some ideas for customizing this script:
 
 ## License
 
-This gist is released under the MIT License. Feel free to use, modify, and distribute.
+This project is released under the MIT License. Feel free to use, modify, and distribute.
 
 ---
 
-**⭐ Star this gist if it helps streamline your development workflow!**
+**⭐ Star this repository if it helps streamline your development workflow!**
 
-💬 **Have improvements or found a bug?** Leave a comment below!
-🍴 **Want to customize it?** Fork this gist and make it your own!
+🐛 **Have improvements or found a bug?** Open an issue or submit a PR!
+🍴 **Want to customize it?** Fork this repository and make it your own!
 📤 **Found it useful?** Share it with your team!
