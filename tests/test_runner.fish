@@ -18,8 +18,28 @@ function test_setup --description "Set up test environment"
     set -g TEST_TEMP_DIR (mktemp -d)
     set -g ORIGINAL_PWD (pwd)
 
+    # Find the wt.fish file - check multiple possible locations
+    set -l possible_paths \
+        (dirname (dirname (realpath (status -f))))/wt.fish \
+        (dirname (dirname (status -f)))/wt.fish \
+        ./wt.fish \
+        ../wt.fish
+    
+    set -l wt_file ""
+    for path in $possible_paths
+        if test -f $path
+            set wt_file $path
+            break
+        end
+    end
+    
+    if test -z "$wt_file"
+        echo "Error: Could not find wt.fish"
+        exit 1
+    end
+    
     # Source the main wt.fish file
-    source (dirname (status -f))/../wt.fish
+    source $wt_file
 
     # Initialize test git repo
     cd $TEST_TEMP_DIR
