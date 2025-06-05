@@ -141,6 +141,11 @@ jobs:
         git config --global user.name "CI Runner"
         git config --global init.defaultBranch main
 
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
     - name: Verify Fish installation
       run: fish --version
 
@@ -236,6 +241,11 @@ jobs:
         git config --global user.email "test@example.com"
         git config --global user.name "Test User"
 
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
     - name: Run integration test
       run: |
         fish -c '
@@ -294,6 +304,11 @@ jobs:
       run: |
         git config --global user.email "perf@example.com"
         git config --global user.name "Performance Tester"
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
 
     - name: Run performance tests
       run: |
