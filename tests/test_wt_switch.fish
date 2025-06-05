@@ -88,7 +88,7 @@ function test_wt_switch_lists_available
     test_case "wt switch - lists available worktrees on error"
 
     cd $TEST_TEMP_DIR/test_repo
-    # Create some worktrees
+    # Create some worktrees for testing error messages
     wt new available-1
     cd $TEST_TEMP_DIR/test_repo
     wt new available-2
