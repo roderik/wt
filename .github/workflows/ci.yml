@@ -1,0 +1,440 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  statuses: write
+  checks: write
+
+jobs:
+  pre-checks:
+    name: Pre-flight Checks
+    runs-on: ubuntu-latest
+    outputs:
+      should_test: ${{ steps.check.outputs.should_test }}
+
+    steps:
+    - uses: fuxingloh/multi-labeler@v4
+      if: github.event_name == 'pull_request'
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Check if tests should run
+      id: check
+      run: |
+        # Always run on main branch, PRs, or manual triggers
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.event_name }}" == "pull_request" ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "should_test=true" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        # Check if any Fish files changed
+        if git diff --name-only HEAD~1 HEAD | grep -E '\.(fish)$'; then
+          echo "should_test=true" >> $GITHUB_OUTPUT
+        else
+          echo "should_test=false" >> $GITHUB_OUTPUT
+        fi
+
+  lint:
+    name: Lint & Syntax Check
+    needs: pre-checks
+    if: needs.pre-checks.outputs.should_test == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Fish shell
+      run: |
+        # Install Fish 4.0 or later
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:fish-shell/nightly-master
+        sudo apt-get update
+        sudo apt-get install -y fish
+
+    - name: Check Fish syntax
+      run: |
+        echo "Checking Fish syntax..."
+        for file in wt.fish tests/*.fish run_tests.fish setup-dev.fish; do
+          if [ -f "$file" ]; then
+            echo "Checking $file"
+            fish -n "$file"
+          fi
+        done
+
+    - name: Check Fish formatting
+      run: |
+        echo "Checking Fish formatting..."
+        for file in wt.fish tests/*.fish run_tests.fish setup-dev.fish; do
+          if [ -f "$file" ]; then
+            echo "Checking $file"
+            if ! fish_indent --check "$file"; then
+              echo "File $file needs formatting. Run: fish_indent -w $file"
+              echo "Or run: ./setup-dev.fish && pre-commit run --all-files"
+              exit 1
+            fi
+          fi
+        done
+
+    - name: Run pre-commit checks
+      uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files
+
+    - name: Run ShellCheck
+      uses: ludeeus/action-shellcheck@master
+      with:
+        scandir: '.'
+        ignore_paths: 'tests'
+        severity: warning
+      continue-on-error: true  # Fish syntax might not be fully compatible
+
+  test:
+    name: Test Suite
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-22.04, macos-latest, macos-13]
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Fish shell (Ubuntu)
+      if: startsWith(matrix.os, 'ubuntu')
+      run: |
+        # Install Fish 4.0 or later
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:fish-shell/nightly-master
+        sudo apt-get update
+        sudo apt-get install -y fish
+
+    - name: Install Fish shell (macOS)
+      if: startsWith(matrix.os, 'macos')
+      run: brew install fish
+
+    - name: Configure Git
+      run: |
+        git config --global user.email "ci@example.com"
+        git config --global user.name "CI Runner"
+        git config --global init.defaultBranch main
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
+    - name: Verify Fish installation
+      run: fish --version
+
+    - name: Run test suite
+      run: fish run_tests.fish
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}
+        path: |
+          test-results/
+          *.log
+
+  test-installation:
+    name: Installation Tests
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Fish shell
+      run: |
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+          # Install Fish 4.0 or later
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository -y ppa:fish-shell/nightly-master
+          sudo apt-get update
+          sudo apt-get install -y fish
+        else
+          brew install fish
+        fi
+
+    - name: Test curl installation
+      run: |
+        # Create a temporary Fish config directory
+        export TEST_FISH_DIR=$(mktemp -d)
+        mkdir -p $TEST_FISH_DIR/functions
+
+        # Test the installation command
+        curl -s https://raw.githubusercontent.com/${{ github.repository }}/main/wt.fish > $TEST_FISH_DIR/functions/wt.fish
+
+        # Verify the file was downloaded
+        test -f $TEST_FISH_DIR/functions/wt.fish
+
+        # Test that Fish can parse it
+        fish -c "set -g fish_function_path $TEST_FISH_DIR/functions \$fish_function_path; wt help"
+
+    - name: Test manual installation
+      run: |
+        # Test manual copy installation
+        export TEST_FISH_DIR=$(mktemp -d)
+        mkdir -p $TEST_FISH_DIR/functions
+        cp wt.fish $TEST_FISH_DIR/functions/
+
+        # Test function availability
+        fish -c "set -g fish_function_path $TEST_FISH_DIR/functions \$fish_function_path; wt help"
+
+  integration-test:
+    name: Integration Tests
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+          # Install Fish 4.0 or later
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository -y ppa:fish-shell/nightly-master
+          sudo apt-get update
+          sudo apt-get install -y fish git
+        else
+          brew install fish git
+        fi
+
+    - name: Configure Git
+      run: |
+        git config --global user.email "test@example.com"
+        git config --global user.name "Test User"
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
+    - name: Run integration test
+      run: |
+        fish -c '
+          # Source the wt function
+          source wt.fish
+
+          # Create a test repository
+          set test_dir (mktemp -d)
+          cd $test_dir
+          git init
+          echo "# Test" > README.md
+          git add README.md
+          git commit -m "Initial commit"
+
+          # Test basic workflow
+          wt new feature-test
+          if test (basename (pwd)) != "feature-test"
+            echo "Failed to create and switch to worktree"
+            exit 1
+          end
+
+          # Verify we can switch back
+          cd $test_dir
+          wt switch feature-test
+
+          # List worktrees
+          wt list
+
+          # Clean up
+          cd $test_dir
+          echo "y" | wt clean
+
+          echo "Integration test passed!"
+        '
+
+  performance-test:
+    name: Performance Tests
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        # Install Fish 4.0 or later
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:fish-shell/nightly-master
+        sudo apt-get update
+        sudo apt-get install -y fish time
+
+    - name: Configure Git
+      run: |
+        git config --global user.email "perf@example.com"
+        git config --global user.name "Performance Tester"
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
+    - name: Run performance tests
+      run: |
+        fish -c '
+          source wt.fish
+
+          # Create test repo with many branches
+          set test_dir (mktemp -d)
+          cd $test_dir
+          git init
+          echo "# Test" > README.md
+          git add README.md
+          git commit -m "Initial"
+
+          # Time creating multiple worktrees
+          echo "Testing worktree creation performance..."
+          for i in (seq 1 10)
+            /usr/bin/time -f "%E" fish -c "source '$PWD'/wt.fish; wt new feature-$i" 2>&1
+          end
+
+          # Time listing many worktrees
+          echo "Testing list performance with many worktrees..."
+          /usr/bin/time -f "%E" fish -c "source '$PWD'/wt.fish; wt list" 2>&1
+
+          # Cleanup
+          cd /tmp
+          rm -rf $test_dir
+        '
+
+  security-scan:
+    name: Security Scan
+    needs: pre-checks
+    if: needs.pre-checks.outputs.should_test == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for hardcoded secrets
+      run: |
+        # Check for potential secrets or sensitive data
+        if grep -rE "(password|secret|key|token)=" . --include="*.fish" | grep -v "test"; then
+          echo "❌ Potential secrets found!"
+          exit 1
+        fi
+        echo "✅ No hardcoded secrets detected"
+
+    - name: Check for unsafe operations
+      run: |
+        # Check for potentially unsafe operations
+        if grep -rE "(rm -rf /|sudo|eval)" wt.fish; then
+          echo "⚠️  Warning: Potentially unsafe operations detected"
+        fi
+
+  coverage-report:
+    name: Test Coverage
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Fish
+      run: |
+        # Install Fish 4.0 or later
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository -y ppa:fish-shell/nightly-master
+        sudo apt-get update
+        sudo apt-get install -y fish
+
+    - name: Analyze test coverage
+      run: |
+        echo "## Test Coverage Report" > coverage-report.md
+        echo "" >> coverage-report.md
+
+        # List all functions in wt.fish
+        echo "### Functions in wt.fish:" >> coverage-report.md
+        grep -E "^function" wt.fish | sed 's/function /- /g' | sed 's/ --description.*//g' >> coverage-report.md
+
+        echo "" >> coverage-report.md
+        echo "### Test Files:" >> coverage-report.md
+        for test in tests/test_*.fish; do
+          echo "- $(basename $test)" >> coverage-report.md
+        done
+
+        echo "" >> coverage-report.md
+        echo "### Test Cases:" >> coverage-report.md
+        grep -h "test_case" tests/test_*.fish | sed 's/.*test_case "/- /g' | sed 's/".*//g' | sort | uniq >> coverage-report.md
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage-report.md
+
+  all-tests-passed:
+    name: CI Status
+    needs: [test, test-installation, integration-test, security-scan]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check status
+      run: |
+        if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+          echo "❌ Some tests failed"
+          exit 1
+        else
+          echo "✅ All tests passed successfully!"
+          echo "Ready for merge/release"
+        fi
