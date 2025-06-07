@@ -209,11 +209,11 @@ function _wt_new --description "Create new worktree"
 
     # If no --from was specified, determine the default branch after fetch
     if test -z "$from_ref"
-        # Use origin/main or origin/master to ensure we get the latest version
-        if git show-ref --verify --quiet refs/remotes/origin/main
-            set from_ref origin/main
-        else if git show-ref --verify --quiet refs/remotes/origin/master
-            set from_ref origin/master
+        # Try to get the default branch from remote HEAD
+        set remote_head (git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null)
+        if test -n "$remote_head"
+            # Extract the branch name from refs/remotes/origin/HEAD -> refs/remotes/origin/main
+            set from_ref (string replace "refs/remotes/" "" $remote_head)
         else if git show-ref --verify --quiet refs/heads/main
             set from_ref main
         else if git show-ref --verify --quiet refs/heads/master
