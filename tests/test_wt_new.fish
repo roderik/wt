@@ -201,6 +201,46 @@ function test_wt_new_default_from_main
     test_pass
 end
 
+function test_wt_new_fetches_from_origin
+    test_case "wt new - fetches latest changes from origin"
+
+    cd $TEST_TEMP_DIR/test_repo
+
+    # Set up a remote repository
+    set remote_repo $TEST_TEMP_DIR/remote_repo
+    git init --bare $remote_repo --quiet
+    git remote add origin $remote_repo
+
+    # Push initial state to remote
+    echo "initial content" >initial.txt
+    git add initial.txt
+    git commit -m "Initial commit" --quiet
+    git push origin main --quiet
+
+    # Make a change directly in the remote (simulating another developer's push)
+    cd $TEST_TEMP_DIR
+    git clone $remote_repo clone_repo --quiet
+    cd clone_repo
+    echo "remote change" >remote.txt
+    git add remote.txt
+    git commit -m "Remote commit" --quiet
+    git push origin main --quiet
+
+    # Go back to original repo (which doesn't have the remote change yet)
+    cd $TEST_TEMP_DIR/test_repo
+
+    # Create a new worktree - it should fetch and include the remote change
+    set output (wt new feature-fetch 2>&1)
+    assert_success "Should create worktree successfully"
+    assert_contains "$output" "Fetching latest changes from origin" "Should show fetch message"
+    assert_contains "$output" "Fetched latest changes from origin" "Should show fetch success"
+
+    # Verify the new worktree has the remote change
+    assert_success test -f remote.txt "Should have file from remote after fetch"
+
+    test_pass
+end
+
 # Run all tests
 test_wt_new_basic
 test_wt_new_from_ref
@@ -213,3 +253,4 @@ test_wt_new_invalid_ref
 test_wt_new_existing_worktree_path
 test_wt_new_creates_worktrees_dir
 test_wt_new_default_from_main
+test_wt_new_fetches_from_origin
