@@ -157,17 +157,8 @@ function _wt_new --description "Create new worktree"
 
     set branch_name $argv[1]
 
-    # Determine the default branch - check for main first, then master
-    if git show-ref --verify --quiet refs/heads/main
-        set from_ref main
-    else if git show-ref --verify --quiet refs/heads/master
-        set from_ref master
-    else
-        # Fallback to current HEAD
-        set from_ref HEAD
-    end
-
-    # Parse optional --from argument
+    # Parse optional --from argument first
+    set from_ref ""
     set i 2
     while test $i -le (count $argv)
         if test "$argv[$i]" = --from
@@ -206,6 +197,31 @@ function _wt_new --description "Create new worktree"
         echo "Error: Branch '$branch_name' already exists"
         echo "Tip: Use 'wt switch $branch_name' to switch to it"
         return 1
+    end
+
+    # Fetch latest changes from origin
+    echo "Fetching latest changes from origin..."
+    if not git fetch origin >/dev/null 2>&1
+        echo "⚠️  Warning: Could not fetch from origin, continuing with local state"
+    else
+        echo "✅ Fetched latest changes from origin"
+    end
+
+    # If no --from was specified, determine the default branch after fetch
+    if test -z "$from_ref"
+        # Try to get the default branch from remote HEAD
+        set remote_head (git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null)
+        if test -n "$remote_head"
+            # Extract the branch name from refs/remotes/origin/HEAD -> refs/remotes/origin/main
+            set from_ref (string replace "refs/remotes/" "" $remote_head)
+        else if git show-ref --verify --quiet refs/heads/main
+            set from_ref main
+        else if git show-ref --verify --quiet refs/heads/master
+            set from_ref master
+        else
+            # Fallback to current HEAD
+            set from_ref HEAD
+        end
     end
 
     # Verify the from ref exists
