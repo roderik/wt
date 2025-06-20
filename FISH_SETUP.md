@@ -79,6 +79,7 @@ Pre-configured aliases for common tasks:
 - `ff` → fzf with file preview
 - `cd` → zoxide (smarter cd)
 - `cdi` → zoxide interactive
+- `claude` → Claude Code CLI (with skip permissions flag)
 
 ### 📝 Git Abbreviations
 
@@ -113,6 +114,15 @@ The setup creates:
 - `~/.config/fish/config.fish` - Fish shell configuration
 - `~/.config/starship.toml` - Starship prompt theme
 - `~/.config/fish/functions/wt.fish` - Git worktree manager (if installed)
+
+### Default Environment Variables
+
+The Fish configuration sets these environment variables by default:
+- `NODE_NO_WARNINGS=1` - Suppresses Node.js warnings
+- `FORCE_AUTO_BACKGROUND_TASKS=1` - Enables Claude Code automatic background tasks
+- `ENABLE_BACKGROUND_TASKS=1` - Enables Claude Code background task execution
+- `EDITOR=nvim` - Sets Neovim as the default editor
+- `VISUAL=nvim` - Sets Neovim as the visual editor
 
 ## System Requirements
 

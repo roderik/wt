@@ -21,6 +21,10 @@ end
 # Environment variables
 set -gx NODE_NO_WARNINGS 1
 
+# Claude Code background tasks
+set -gx FORCE_AUTO_BACKGROUND_TASKS 1
+set -gx ENABLE_BACKGROUND_TASKS 1
+
 # Default editor
 set -gx EDITOR nvim
 set -gx VISUAL nvim
@@ -106,6 +110,11 @@ alias ff="fzf --preview 'bat --style=numbers --color=always {}'"
 alias n='nvim'
 alias vim='nvim'
 alias exa='eza'
+
+# Claude function to avoid infinite recursion
+function claude --description 'Claude Code with skip permissions'
+    command claude --dangerously-skip-permissions $argv
+end
 
 # Interactive session configuration
 if status is-interactive
