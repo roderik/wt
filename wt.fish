@@ -120,7 +120,7 @@ function _wt_get_repo_root --description "Get the repository root consistently"
     if test $status -eq 0
         # If we got a common dir, the repo root is its parent
         if string match -q "*/.git" $git_common_dir
-            echo (dirname $git_common_dir)
+            echo (realpath (dirname $git_common_dir))
             return 0
         end
     end
@@ -136,12 +136,12 @@ function _wt_get_repo_root --description "Get the repository root consistently"
                 set git_dir (string replace "gitdir: " "" $gitfile_content)
                 # Extract main repo path from worktree git dir
                 if string match -q "*/.git/worktrees/*" $git_dir
-                    echo (string replace -r "/.git/worktrees/.*" "" $git_dir)
+                    echo (realpath (string replace -r "/.git/worktrees/.*" "" $git_dir))
                     return 0
                 end
             end
         else
-            echo $toplevel
+            echo (realpath $toplevel)
             return 0
         end
     end
