@@ -75,13 +75,19 @@ for tool in "${TOOLS[@]}"; do
     fi
 done
 
-# Start atuin service
-echo -e "${YELLOW}🚀 Starting atuin service...${NC}"
+# Start atuin service (optional, may fail on some macOS versions)
+echo -e "${YELLOW}🚀 Configuring atuin...${NC}"
 if "$BREW_PATH" services list | grep -q "atuin.*started"; then
     echo -e "${GREEN}✓ atuin service is already running${NC}"
 else
-    "$BREW_PATH" services start atuin
-    echo -e "${GREEN}✓ atuin service started${NC}"
+    # Try to start the service, but don't fail if it doesn't work
+    if "$BREW_PATH" services start atuin 2>/dev/null; then
+        echo -e "${GREEN}✓ atuin service started${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Could not start atuin service automatically${NC}"
+        echo -e "${YELLOW}   This is normal on some macOS versions. Atuin will still work in your shell.${NC}"
+        echo -e "${YELLOW}   To manually start atuin daemon if needed: atuin daemon${NC}"
+    fi
 fi
 
 # Add Fish to allowed shells
