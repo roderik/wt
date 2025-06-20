@@ -56,7 +56,7 @@ wt remove feature-auth
 - ✨ **Simple Commands** - Intuitive command structure (`new`, `switch`, `list`, `remove`)
 - 📦 **Auto Package Install** - Detects and runs the right package manager (Bun/NPM/Yarn/PNPM)
 - 🎯 **Flexible Creation** - Create worktrees from any branch, tag, or commit
-- 🗂️ **Clean Organization** - Stores worktrees in `.worktrees/` at repository root
+- 🗂️ **Clean Organization** - Stores worktrees in `~/.wt/<repo-name>/` for global organization
 - 📊 **Rich Status Info** - See branch status, changes, and tracking info
 - 🧹 **Safe Cleanup** - Remove worktrees with confirmation prompts
 - ⌨️ **Tab Completion** - Full Fish shell completion support
@@ -84,16 +84,20 @@ wt --all                        # Open in all editors
 ### Directory Structure
 
 ```
-my-project/
-├── .git/                    # Shared repository
-├── src/                     # Main workspace
+~/.wt/
+├── my-project/             # Repository-specific worktrees
+│   ├── feature-auth/      # Independent workspace
+│   │   ├── src/          # Same structure as main
+│   │   └── node_modules/ # Separate deps
+│   └── bugfix-login/
+└── another-project/       # Different repo's worktrees
+    └── new-feature/
+
+my-project/                 # Main repository
+├── .git/                  # Shared repository
+├── src/                   # Main workspace
 ├── package.json
-├── bun.lockb               # Detected → uses bun
-└── .worktrees/            # Worktree directory
-    ├── feature-auth/      # Independent workspace
-    │   ├── src/          # Same structure
-    │   └── node_modules/ # Separate deps
-    └── bugfix-login/
+└── bun.lockb             # Detected → uses bun
 ```
 
 ### Package Manager Detection

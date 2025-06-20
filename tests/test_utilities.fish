@@ -86,12 +86,12 @@ function test_worktree_path_handling
     mkdir -p very/deep/nested/structure
     cd very/deep/nested/structure
 
-    # Should still create worktree in repo root/.worktrees
+    # Should create worktree in ~/.wt/<repo_name>/
     wt new nested-test
 
-    # Go back to repo root to check
-    cd $TEST_TEMP_DIR/test_repo
-    assert_dir_exists .worktrees/nested-test "Should create in root .worktrees"
+    # Check the worktree was created in the new location
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_exists ~/.wt/$repo_name/nested-test "Should create in ~/.wt/<repo>/nested-test"
 
     test_pass
 end
