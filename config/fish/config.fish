@@ -21,10 +21,6 @@ end
 # Environment variables
 set -gx NODE_NO_WARNINGS 1
 
-# Claude Code background tasks
-set -gx FORCE_AUTO_BACKGROUND_TASKS 1
-set -gx ENABLE_BACKGROUND_TASKS 1
-
 # Default editor
 set -gx EDITOR nvim
 set -gx VISUAL nvim
