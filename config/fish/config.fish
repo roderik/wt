@@ -110,7 +110,11 @@ alias ff="fzf --preview 'bat --style=numbers --color=always {}'"
 alias n='nvim'
 alias vim='nvim'
 alias exa='eza'
-alias claude='claude --dangerously-skip-permissions'
+
+# Claude function to avoid infinite recursion
+function claude --description 'Claude Code with skip permissions'
+    command claude --dangerously-skip-permissions $argv
+end
 
 # Interactive session configuration
 if status is-interactive
