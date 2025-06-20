@@ -45,8 +45,9 @@ function test_integration_full_workflow
     cd $TEST_TEMP_DIR/test_repo
     echo y | wt clean
 
-    assert_dir_not_exists .worktrees/feature-integration "Feature worktree should be removed"
-    assert_dir_not_exists .worktrees/bugfix-integration "Bugfix worktree should be removed"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_not_exists ~/.wt/$repo_name/feature-integration "Feature worktree should be removed"
+    assert_dir_not_exists ~/.wt/$repo_name/bugfix-integration "Bugfix worktree should be removed"
 
     test_pass
 end

@@ -14,7 +14,8 @@ function test_wt_remove_basic
     assert_success "Should remove successfully"
 
     # Verify worktree is gone
-    assert_dir_not_exists .worktrees/feature-remove "Worktree directory should be removed"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_not_exists ~/.wt/$repo_name/feature-remove "Worktree directory should be removed"
 
     # Branch should still exist unless we confirm deletion
     assert_branch_exists feature-remove "Branch should still exist"
@@ -35,7 +36,8 @@ function test_wt_remove_with_branch_deletion
     assert_success "Should remove successfully"
 
     # Verify both worktree and branch are gone
-    assert_dir_not_exists .worktrees/feature-remove-branch "Worktree should be removed"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_not_exists ~/.wt/$repo_name/feature-remove-branch "Worktree should be removed"
     assert_branch_not_exists feature-remove-branch "Branch should be deleted"
 
     test_pass
@@ -76,7 +78,8 @@ function test_wt_remove_current_worktree
     assert_equal (pwd) "$TEST_TEMP_DIR/test_repo" "Should be in main repository"
 
     # Verify worktree is gone
-    assert_dir_not_exists .worktrees/feature-current-remove "Worktree should be removed"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_not_exists ~/.wt/$repo_name/feature-current-remove "Worktree should be removed"
 
     test_pass
 end
@@ -92,7 +95,8 @@ function test_wt_remove_cancel
     echo n | wt remove feature-cancel
 
     # Verify worktree still exists
-    assert_dir_exists .worktrees/feature-cancel "Worktree should still exist"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_exists ~/.wt/$repo_name/feature-cancel "Worktree should still exist"
     assert_branch_exists feature-cancel "Branch should still exist"
 
     test_pass

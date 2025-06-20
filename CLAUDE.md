@@ -43,7 +43,7 @@ The codebase implements a git worktree manager as a single Fish shell function w
 
 ### Key Design Decisions
 1. **Single File Design**: All functionality in wt.fish for easy distribution
-2. **Worktree Location**: Creates worktrees in `.worktrees/` directory at repository root
+2. **Worktree Location**: Creates worktrees in `~/.wt/<repo-name>/` for global organization
 3. **Package Manager Detection**: Auto-detects Bun/NPM/Yarn/PNPM based on lockfiles
 4. **Safety**: Requires confirmation for destructive operations (remove, clean)
 5. **Error Handling**: Validates git repository status before all operations

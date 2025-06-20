@@ -109,7 +109,7 @@ function _wt_help --description "Show wt help information"
     echo "  wt --all                     Launch both editors"
     echo ""
     echo "TIPS:"
-    echo "  • Worktrees are created in .worktrees/ directory"
+    echo "  • Worktrees are created in ~/.wt/<repo-name>/ directory"
     echo "  • Each worktree has its own node_modules"
     echo "  • Use 'wt clean' to remove all worktrees safely"
 end
@@ -147,6 +147,16 @@ function _wt_get_repo_root --description "Get the repository root consistently"
     end
 
     return 1
+end
+
+function _wt_get_repo_name --description "Get repository name from repo root"
+    set repo_root (_wt_get_repo_root)
+    if test $status -ne 0
+        return 1
+    end
+
+    # Extract repository name from path
+    echo (basename $repo_root)
 end
 
 function _wt_new --description "Create new worktree"
@@ -230,14 +240,21 @@ function _wt_new --description "Create new worktree"
         return 1
     end
 
-    # Create worktrees directory in the repository root if it doesn't exist
-    set worktree_dir "$repo_root/.worktrees"
-    if not test -d $worktree_dir
-        mkdir -p $worktree_dir
-        echo "Created worktrees directory: $worktree_dir"
+    # Get repository name for the worktree path
+    set repo_name (_wt_get_repo_name)
+    if test $status -ne 0
+        echo "Error: Could not determine repository name"
+        return 1
     end
 
-    set worktree_path "$worktree_dir/$branch_name"
+    # Create worktrees directory in ~/.wt/<repo_name> if it doesn't exist
+    set worktree_base_dir "$HOME/.wt/$repo_name"
+    if not test -d $worktree_base_dir
+        mkdir -p $worktree_base_dir
+        echo "Created worktrees directory: $worktree_base_dir"
+    end
+
+    set worktree_path "$worktree_base_dir/$branch_name"
 
     # Check if worktree path already exists
     if test -d $worktree_path
@@ -343,7 +360,14 @@ function _wt_switch --description "Switch to existing worktree"
         end
     end
 
-    set worktree_path "$repo_root/.worktrees/$branch_name"
+    # Get repository name for the worktree path
+    set repo_name (_wt_get_repo_name)
+    if test $status -ne 0
+        echo "Error: Could not determine repository name"
+        return 1
+    end
+
+    set worktree_path "$HOME/.wt/$repo_name/$branch_name"
 
     if test -d $worktree_path
         cd $worktree_path
@@ -402,10 +426,11 @@ function _wt_list --description "List all git worktrees"
                 end
 
                 # Format the output
-                # Get repository root to check if this is a worktree
+                # Get repository root and name to check if this is a worktree
                 set repo_root (_wt_get_repo_root)
-                # Check if this path is under repo_root/.worktrees/
-                if string match -q "$repo_root/.worktrees/*" $current_path
+                set repo_name (_wt_get_repo_name)
+                # Check if this path is under ~/.wt/<repo_name>/
+                if string match -q "$HOME/.wt/$repo_name/*" $current_path
                     set display_path (basename $current_path)
                     echo -n "🌿 $current_branch"
                 else
@@ -449,8 +474,10 @@ function _wt_status --description "Show current worktree status"
         return 1
     end
 
-    # Check if current directory is under repo_root/.worktrees/
-    if string match -q "$repo_root/.worktrees/*" $current_dir
+    # Get repository name to check if we're in a worktree
+    set repo_name (_wt_get_repo_name)
+    # Check if current directory is under ~/.wt/<repo_name>/
+    if string match -q "$HOME/.wt/$repo_name/*" $current_dir
         echo "📍 Type: Worktree"
     else
         echo "📍 Type: Main repository"
@@ -503,7 +530,14 @@ function _wt_remove --description "Remove specific worktree"
         return 1
     end
 
-    set worktree_path "$repo_root/.worktrees/$branch_name"
+    # Get repository name for the worktree path
+    set repo_name (_wt_get_repo_name)
+    if test $status -ne 0
+        echo "Error: Could not determine repository name"
+        return 1
+    end
+
+    set worktree_path "$HOME/.wt/$repo_name/$branch_name"
 
     if not test -d $worktree_path
         echo "Error: Worktree not found: $worktree_path"
@@ -594,9 +628,10 @@ function _wt_clean --description "Clean up all git worktrees"
                     set worktrees_to_remove $worktrees_to_remove $current_worktree
                 end
             else
-                # Only include worktrees in .worktrees directory of the current repo
-                # Check if the worktree is under repo_root/.worktrees/
-                set worktrees_dir "$repo_root/.worktrees"
+                # Only include worktrees in ~/.wt/<repo_name>/ directory
+                # Get repository name to check worktree location
+                set repo_name (_wt_get_repo_name)
+                set worktrees_dir "$HOME/.wt/$repo_name"
                 if string match -q "$worktrees_dir/*" $current_worktree
                     set worktrees_to_remove $worktrees_to_remove $current_worktree
                 end

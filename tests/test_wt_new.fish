@@ -14,7 +14,8 @@ function test_wt_new_basic
 
     # Verify we're in the new worktree
     set current_dir (pwd)
-    assert_contains $current_dir "/.worktrees/feature-test" "Should be in worktree directory"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_contains $current_dir "/.wt/$repo_name/feature-test" "Should be in worktree directory"
 
     # Verify worktree directory exists (check from current location)
     assert_success test -d . "Worktree directory should exist"
@@ -137,7 +138,8 @@ function test_wt_new_existing_worktree_path
 
     cd $TEST_TEMP_DIR/test_repo
     # Create worktree directory manually
-    mkdir -p .worktrees/manual-worktree
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    mkdir -p ~/.wt/$repo_name/manual-worktree
 
     # Try to create worktree with same path
     wt new manual-worktree 2>/dev/null
@@ -147,19 +149,19 @@ function test_wt_new_existing_worktree_path
 end
 
 function test_wt_new_creates_worktrees_dir
-    test_case "wt new - creates .worktrees directory"
+    test_case "wt new - creates ~/.wt/<repo> directory"
 
     cd $TEST_TEMP_DIR/test_repo
-    # Remove .worktrees if it exists
-    rm -rf .worktrees
+    # Remove ~/.wt/<repo> if it exists
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    rm -rf ~/.wt/$repo_name
 
     # Create a worktree
     wt new first-worktree
     assert_success "Should create worktree"
 
-    # Go back to main repo to check
-    cd $TEST_TEMP_DIR/test_repo
-    assert_dir_exists .worktrees "Should create .worktrees directory"
+    # Check that the directory was created
+    assert_dir_exists ~/.wt/$repo_name "Should create ~/.wt/<repo> directory"
 
     test_pass
 end

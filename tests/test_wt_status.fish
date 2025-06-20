@@ -29,7 +29,8 @@ function test_wt_status_in_worktree
 
     assert_contains "$output" "Type: Worktree" "Should identify as worktree"
     assert_contains "$output" "Branch: feature-status" "Should show correct branch"
-    assert_contains "$output" ".worktrees/feature-status" "Should show worktree path"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_contains "$output" ".wt/$repo_name/feature-status" "Should show worktree path"
 
     test_pass
 end

@@ -17,7 +17,8 @@ function test_wt_switch_basic
 
     # Verify we're in the correct directory
     set current_dir (pwd)
-    assert_contains $current_dir "/.worktrees/feature-switch" "Should be in worktree directory"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_contains $current_dir "/.wt/$repo_name/feature-switch" "Should be in worktree directory"
 
     # Verify branch
     set current_branch (git branch --show-current)
@@ -79,7 +80,8 @@ function test_wt_switch_from_worktree
     assert_success "Should switch between worktrees"
 
     set current_dir (pwd)
-    assert_contains $current_dir "/.worktrees/worktree-a" "Should be in worktree-a"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_contains $current_dir "/.wt/$repo_name/worktree-a" "Should be in worktree-a"
 
     test_pass
 end
@@ -123,7 +125,8 @@ function test_wt_switch_to_main
 
     # Verify we're in the worktree
     set current_dir (pwd)
-    assert_contains $current_dir "/.worktrees/feature-branch" "Should be in worktree"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_contains $current_dir "/.wt/$repo_name/feature-branch" "Should be in worktree"
 
     # Switch back to default branch
     wt switch $default_branch

@@ -84,7 +84,8 @@ function test_wt_list_shows_paths
 
     set output (wt list 2>&1)
     assert_success "Should list successfully"
-    assert_contains "$output" ".worktrees/feature-paths" "Should show worktree path"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_contains "$output" ".wt/$repo_name/feature-paths" "Should show worktree path"
     assert_contains "$output" test_repo "Should show main repo path"
 
     test_pass

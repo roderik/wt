@@ -27,9 +27,10 @@ function test_wt_clean_with_worktrees
     echo y | wt clean
 
     # Verify all worktrees are removed
-    assert_dir_not_exists .worktrees/feature-clean-1 "First worktree should be removed"
-    assert_dir_not_exists .worktrees/feature-clean-2 "Second worktree should be removed"
-    assert_dir_not_exists .worktrees/feature-clean-3 "Third worktree should be removed"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_not_exists ~/.wt/$repo_name/feature-clean-1 "First worktree should be removed"
+    assert_dir_not_exists ~/.wt/$repo_name/feature-clean-2 "Second worktree should be removed"
+    assert_dir_not_exists ~/.wt/$repo_name/feature-clean-3 "Third worktree should be removed"
 
     test_pass
 end
@@ -48,8 +49,9 @@ function test_wt_clean_cancel
     echo n | wt clean
 
     # Verify worktrees still exist
-    assert_dir_exists .worktrees/feature-cancel-clean-1 "First worktree should still exist"
-    assert_dir_exists .worktrees/feature-cancel-clean-2 "Second worktree should still exist"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_exists ~/.wt/$repo_name/feature-cancel-clean-1 "First worktree should still exist"
+    assert_dir_exists ~/.wt/$repo_name/feature-cancel-clean-2 "Second worktree should still exist"
 
     test_pass
 end
@@ -124,28 +126,30 @@ function test_wt_clean_all_flag
     echo y | wt clean --all
 
     # Both should be removed
-    assert_dir_not_exists .worktrees/feature-dotworktrees "Dotworktrees worktree should be removed"
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_not_exists ~/.wt/$repo_name/feature-dotworktrees "Dotworktrees worktree should be removed"
     assert_dir_not_exists ../external-worktree "External worktree should be removed"
 
     test_pass
 end
 
 function test_wt_clean_only_dotworktrees
-    test_case "wt clean - only cleans .worktrees by default"
+    test_case "wt clean - only cleans ~/.wt/<repo> by default"
 
     cd $TEST_TEMP_DIR/test_repo
-    # Create worktree in .worktrees
+    # Create worktree in ~/.wt/<repo>
     wt new feature-internal
     cd $TEST_TEMP_DIR/test_repo
 
-    # Create worktree outside .worktrees
+    # Create worktree outside ~/.wt/<repo>
     git worktree add ../external-worktree-2 -b external-branch-2 --quiet
 
     # Clean without --all flag
     echo y | wt clean
 
-    # Only .worktrees should be removed
-    assert_dir_not_exists .worktrees/feature-internal "Internal worktree should be removed"
+    # Only ~/.wt/<repo> worktrees should be removed
+    set repo_name (basename $TEST_TEMP_DIR/test_repo)
+    assert_dir_not_exists ~/.wt/$repo_name/feature-internal "Internal worktree should be removed"
     assert_dir_exists ../external-worktree-2 "External worktree should still exist"
 
     # Cleanup external worktree
