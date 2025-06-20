@@ -109,7 +109,7 @@ function _wt_help --description "Show wt help information"
     echo "  wt --all                     Launch both editors"
     echo ""
     echo "TIPS:"
-    echo "  • Worktrees are created in ~/.wt/<repo-name>/ directory"
+    echo "  • Worktrees are created in ~/.wt/\$(basename \$repo_root)/ directory"
     echo "  • Each worktree has its own node_modules"
     echo "  • Use 'wt clean' to remove all worktrees safely"
 end
@@ -249,26 +249,26 @@ function _wt_new --description "Create new worktree"
 
     # Create worktrees directory in ~/.wt/<repo_name> if it doesn't exist
     set worktree_base_dir "$HOME/.wt/$repo_name"
-    if not test -d $worktree_base_dir
-        mkdir -p $worktree_base_dir
+    if not test -d "$worktree_base_dir"
+        mkdir -p -- "$worktree_base_dir"
         echo "Created worktrees directory: $worktree_base_dir"
     end
 
     set worktree_path "$worktree_base_dir/$branch_name"
 
     # Check if worktree path already exists
-    if test -d $worktree_path
+    if test -d "$worktree_path"
         echo "Error: Worktree directory already exists: $worktree_path"
         return 1
     end
 
     # Create the worktree with the new branch from specified ref
     echo "Creating worktree from '$from_ref'..."
-    if git worktree add -b $branch_name $worktree_path $from_ref
+    if git worktree add -b "$branch_name" "$worktree_path" "$from_ref"
         echo "✅ Successfully created worktree and branch '$branch_name'"
         echo "📍 Based on: $from_ref"
         echo "Switching to worktree directory..."
-        cd $worktree_path
+        cd "$worktree_path"
         echo "📁 Location: "(pwd)
         echo "🌿 Branch: "(git branch --show-current)
 
@@ -341,9 +341,9 @@ function _wt_switch --description "Switch to existing worktree"
 
     # Special handling for default branches (main/master)
     if test "$branch_name" = main -o "$branch_name" = master
-        cd $repo_root
+        cd "$repo_root"
         # Try to checkout the requested branch
-        if git checkout $branch_name --quiet 2>/dev/null
+        if git checkout "$branch_name" --quiet 2>/dev/null
             echo "✅ Switched to main repository"
             echo "📁 Location: "(pwd)
             echo "🌿 Branch: "(git branch --show-current)
@@ -369,8 +369,8 @@ function _wt_switch --description "Switch to existing worktree"
 
     set worktree_path "$HOME/.wt/$repo_name/$branch_name"
 
-    if test -d $worktree_path
-        cd $worktree_path
+    if test -d "$worktree_path"
+        cd "$worktree_path"
         echo "✅ Switched to worktree: $branch_name"
         echo "📁 Location: "(pwd)
         echo "🌿 Branch: "(git branch --show-current)
@@ -428,14 +428,24 @@ function _wt_list --description "List all git worktrees"
                 # Format the output
                 # Get repository root and name to check if this is a worktree
                 set repo_root (_wt_get_repo_root)
-                set repo_name (_wt_get_repo_name)
-                # Check if this path is under ~/.wt/<repo_name>/
-                if string match -q "$HOME/.wt/$repo_name/*" $current_path
-                    set display_path (basename $current_path)
-                    echo -n "🌿 $current_branch"
+                if test $status -eq 0
+                    set repo_name (_wt_get_repo_name)
+                    if test $status -eq 0
+                        # Check if this path is under ~/.wt/<repo_name>/
+                        if string match -q "$HOME/.wt/$repo_name/*" "$current_path"
+                            set display_path (basename $current_path)
+                            echo -n "🌿 $current_branch"
+                        else
+                            set display_path main
+                            echo -n "🏠 $current_branch"
+                        end
+                    else
+                        # Fallback if repo name cannot be determined
+                        echo -n "📍 $current_branch"
+                    end
                 else
-                    set display_path main
-                    echo -n "🏠 $current_branch"
+                    # Fallback if repo root cannot be determined
+                    echo -n "📍 $current_branch"
                 end
 
                 echo " ($current_commit) - $current_path"
@@ -476,10 +486,15 @@ function _wt_status --description "Show current worktree status"
 
     # Get repository name to check if we're in a worktree
     set repo_name (_wt_get_repo_name)
-    # Check if current directory is under ~/.wt/<repo_name>/
-    if string match -q "$HOME/.wt/$repo_name/*" $current_dir
-        echo "📍 Type: Worktree"
+    if test $status -eq 0
+        # Check if current directory is under ~/.wt/<repo_name>/
+        if string match -q "$HOME/.wt/$repo_name/*" "$current_dir"
+            echo "📍 Type: Worktree"
+        else
+            echo "📍 Type: Main repository"
+        end
     else
+        # Default to main repository if repo name cannot be determined
         echo "📍 Type: Main repository"
     end
 
@@ -539,7 +554,7 @@ function _wt_remove --description "Remove specific worktree"
 
     set worktree_path "$HOME/.wt/$repo_name/$branch_name"
 
-    if not test -d $worktree_path
+    if not test -d "$worktree_path"
         echo "Error: Worktree not found: $worktree_path"
         return 1
     end
@@ -551,7 +566,7 @@ function _wt_remove --description "Remove specific worktree"
         echo "📍 Switching to main repository first..."
 
         # Switch to main repository
-        cd $repo_root
+        cd "$repo_root"
         if test $status -ne 0
             echo "❌ Failed to switch to main repository"
             return 1
@@ -567,13 +582,13 @@ function _wt_remove --description "Remove specific worktree"
     read -l -P "Remove this worktree? [y/N]: " confirmation
 
     if test "$confirmation" = y; or test "$confirmation" = Y
-        if git worktree remove $worktree_path --force
+        if git worktree remove "$worktree_path" --force
             echo "✅ Successfully removed worktree: $branch_name"
 
             # Ask if they want to delete the branch too
             read -l -P "Also delete the branch '$branch_name'? [y/N]: " delete_branch
             if test "$delete_branch" = y; or test "$delete_branch" = Y
-                if git branch -D $branch_name
+                if git branch -D "$branch_name"
                     echo "✅ Successfully deleted branch: $branch_name"
                 else
                     echo "⚠️  Failed to delete branch: $branch_name"
@@ -631,9 +646,11 @@ function _wt_clean --description "Clean up all git worktrees"
                 # Only include worktrees in ~/.wt/<repo_name>/ directory
                 # Get repository name to check worktree location
                 set repo_name (_wt_get_repo_name)
-                set worktrees_dir "$HOME/.wt/$repo_name"
-                if string match -q "$worktrees_dir/*" $current_worktree
-                    set worktrees_to_remove $worktrees_to_remove $current_worktree
+                if test $status -eq 0
+                    set worktrees_dir "$HOME/.wt/$repo_name"
+                    if string match -q "$worktrees_dir/*" "$current_worktree"
+                        set worktrees_to_remove $worktrees_to_remove $current_worktree
+                    end
                 end
             end
         end
@@ -680,7 +697,7 @@ function _wt_clean --description "Clean up all git worktrees"
         # Always navigate back to repository root after cleaning
         echo ""
         echo "📁 Returning to repository root: $repo_root"
-        cd $repo_root
+        cd "$repo_root"
     else
         echo "Cleanup cancelled"
     end
