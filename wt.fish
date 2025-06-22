@@ -272,6 +272,23 @@ function _wt_new --description "Create new worktree"
         echo "📁 Location: "(pwd)
         echo "🌿 Branch: "(git branch --show-current)
 
+        # Set up branch to track its own remote branch
+        echo "Setting up remote tracking..."
+        # Check if the remote branch exists
+        if git show-ref --verify --quiet "refs/remotes/origin/$branch_name"
+            # Remote branch exists, set it as upstream
+            if git branch --set-upstream-to="origin/$branch_name" "$branch_name"
+                echo "✅ Branch will push to origin/$branch_name"
+            else
+                echo "⚠️  Warning: Failed to set upstream tracking for $branch_name"
+            end
+        else
+            # Remote branch doesn't exist yet, configure push behavior
+            git config "branch.$branch_name.remote" origin
+            git config "branch.$branch_name.merge" "refs/heads/$branch_name"
+            echo "✅ Branch configured to push to origin/$branch_name (will create remote branch on first push)"
+        end
+
         # Check for package manager files and run install
         if test -f "package.json"
             echo ""
