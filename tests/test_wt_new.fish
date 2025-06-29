@@ -243,6 +243,65 @@ function test_wt_new_fetches_from_origin
     test_pass
 end
 
+function test_wt_new_editor_options
+    test_case "wt new - editor launch options"
+
+    cd $TEST_TEMP_DIR/test_repo
+    
+    # Test help shows editor options
+    set output (wt new 2>&1)
+    assert_contains "$output" "--claude" "Should show --claude option"
+    assert_contains "$output" "--cursor" "Should show --cursor option"
+    assert_contains "$output" "--all" "Should show --all option"
+    assert_contains "$output" "--none" "Should show --none option"
+    
+    test_pass
+end
+
+function test_wt_new_with_none_option
+    test_case "wt new --none - creates worktree without launching editor"
+
+    cd $TEST_TEMP_DIR/test_repo
+    
+    # Create worktree with --none option
+    set output (wt new feature-no-editor --none 2>&1)
+    assert_success "Should create worktree successfully"
+    
+    # Verify worktree was created
+    assert_branch_exists feature-no-editor "Branch should exist"
+    
+    # Verify no editor launch messages (use string match to check they're NOT present)
+    if string match -q "*Launching Cursor*" $output
+        echo ""
+        echo "✗ Test failed: Output should not contain 'Launching Cursor'"
+        return 1
+    end
+    if string match -q "*Launching Claude*" $output
+        echo ""
+        echo "✗ Test failed: Output should not contain 'Launching Claude'"
+        return 1
+    end
+    
+    test_pass
+end
+
+
+function test_wt_new_editor_options_with_from
+    test_case "wt new - editor options work with --from"
+
+    cd $TEST_TEMP_DIR/test_repo
+    
+    # Create a tag to use as ref
+    git tag v1.0.0
+    
+    # Test --none option with --from
+    wt new feature-from-tag --from v1.0.0 --none
+    assert_success "Should create worktree with --from and --none"
+    assert_branch_exists feature-from-tag "Branch should exist"
+    
+    test_pass
+end
+
 # Run all tests
 test_wt_new_basic
 test_wt_new_from_ref
@@ -256,3 +315,6 @@ test_wt_new_existing_worktree_path
 test_wt_new_creates_worktrees_dir
 test_wt_new_default_from_main
 test_wt_new_fetches_from_origin
+test_wt_new_editor_options
+test_wt_new_with_none_option
+test_wt_new_editor_options_with_from

@@ -11,7 +11,8 @@
 # but the separate file approach is cleaner and more maintainable.
 #
 # USAGE:
-#   wt new <branch> [--from <ref>]  - Create worktree from ref (default: main/master)
+#   wt new <branch> [--from <ref>] [--claude|--cursor|--all|--none]
+#                                   - Create worktree
 #   wt switch <branch>              - Switch to existing worktree
 #   wt list                         - List all worktrees with status
 #   wt clean [--all]                - Clean up worktrees (--all includes non-.worktrees)
@@ -25,6 +26,8 @@
 # EXAMPLES:
 #   wt new feature-auth             # Create from default branch
 #   wt new hotfix --from v1.0.0     # Create from specific tag
+#   wt new api-fix --claude         # Create worktree and launch Claude
+#   wt new ui-update --all          # Create worktree and launch both editors
 #   wt switch feature-auth          # Switch to worktree
 #   wt remove api-fix               # Remove specific worktree
 #   wt status                       # Show current status
@@ -84,7 +87,12 @@ function _wt_help --description "Show wt help information"
     echo "  wt <subcommand> [arguments]"
     echo ""
     echo "SUBCOMMANDS:"
-    echo "  new <branch> [--from <ref>]  Create new worktree from ref (default: main/master)"
+    echo "  new <branch> [options]       Create new worktree"
+    echo "    --from <ref>               Base worktree on ref (default: main/master)"
+    echo "    --claude                   Launch Claude Code after creation"
+    echo "    --cursor                   Launch Cursor after creation"
+    echo "    --all                      Launch both Claude and Cursor"
+    echo "    --none                     Don't launch any editor"
     echo "  switch, s <branch>           Switch to existing worktree"
     echo "  list, ls                     List all worktrees with status"
     echo "  clean [--all]                Clean up worktrees (--all includes all)"
@@ -100,6 +108,8 @@ function _wt_help --description "Show wt help information"
     echo "EXAMPLES:"
     echo "  wt new feature-auth          Create from default branch"
     echo "  wt new hotfix --from v1.0.0  Create from specific tag"
+    echo "  wt new api-fix --claude      Create worktree and launch Claude Code"
+    echo "  wt new ui-update --all       Create worktree and launch both editors"
     echo "  wt switch feature-auth       Switch to worktree"
     echo "  wt switch main               Switch back to main branch"
     echo "  wt remove api-fix            Remove specific worktree"
@@ -161,24 +171,45 @@ end
 
 function _wt_new --description "Create new worktree"
     if test (count $argv) -eq 0
-        echo "Usage: wt new <branch> [--from <ref>]"
+        echo "Usage: wt new <branch> [--from <ref>] [--claude|--cursor|--all|--none]"
         return 1
     end
 
     set branch_name $argv[1]
 
-    # Parse optional --from argument first
+    # Parse optional arguments
     set from_ref ""
+    set launch_claude false
+    set launch_cursor false
+    set launch_none false
+
     set i 2
     while test $i -le (count $argv)
-        if test "$argv[$i]" = --from
-            set i (math $i + 1)
-            if test $i -le (count $argv)
-                set from_ref $argv[$i]
-            else
-                echo "Error: --from requires a ref argument"
-                return 1
-            end
+        switch $argv[$i]
+            case --from
+                set i (math $i + 1)
+                if test $i -le (count $argv)
+                    set from_ref $argv[$i]
+                else
+                    echo "Error: --from requires a ref argument"
+                    return 1
+                end
+            case --claude
+                set launch_claude true
+                set launch_cursor false
+                set launch_none false
+            case --cursor
+                set launch_cursor true
+                set launch_claude false
+                set launch_none false
+            case --all
+                set launch_claude true
+                set launch_cursor true
+                set launch_none false
+            case --none
+                set launch_none true
+                set launch_claude false
+                set launch_cursor false
         end
         set i (math $i + 1)
     end
@@ -327,6 +358,26 @@ function _wt_new --description "Create new worktree"
                 else
                     echo "⚠️  Warning: bun install failed"
                 end
+            end
+        end
+
+        # Launch editors based on options
+        if test $launch_none = false
+            if test $launch_cursor = true -a $launch_claude = true
+                # Launch both editors
+                echo ""
+                echo "Launching Cursor..."
+                cursor .
+                echo "Launching Claude Code..."
+                claude --dangerously-skip-permissions
+            else if test $launch_cursor = true
+                echo ""
+                echo "Launching Cursor..."
+                cursor .
+            else if test $launch_claude = true
+                echo ""
+                echo "Launching Claude Code..."
+                claude --dangerously-skip-permissions
             end
         end
     else
