@@ -194,6 +194,9 @@ function _wt_new --description "Create new worktree"
                     echo "Error: --from requires a ref argument"
                     return 1
                 end
+                # Skip the extra increment at the bottom of the loop
+                set i (math $i + 1)
+                continue
             case --claude
                 set launch_claude true
                 set launch_cursor false
