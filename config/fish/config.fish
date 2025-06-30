@@ -23,6 +23,7 @@ set -gx NODE_NO_WARNINGS 1
 
 # Claude
 set -gx ENABLE_BACKGROUND_TASKS 1
+set -gx CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR 1
 
 # Default editor
 set -gx EDITOR nvim
