@@ -21,7 +21,7 @@ end
 # Environment variables
 set -gx NODE_NO_WARNINGS 1
 
-# Claude 
+# Claude
 set -gx ENABLE_BACKGROUND_TASKS 1
 
 # Default editor
