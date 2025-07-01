@@ -62,17 +62,17 @@ function wt --description "Git worktree management"
         case --claude
             # Launch Claude with dangerously skip permissions
             echo "Launching Claude Code..."
-            claude --dangerously-skip-permissions
+            env SHELL=(which fish) claude --dangerously-skip-permissions
         case --cursor
             # Launch Cursor in current directory
             echo "Launching Cursor..."
-            cursor .
+            env SHELL=(which fish) cursor .
         case --all
             # Launch both editors - Cursor first (UI), then Claude (terminal)
             echo "Launching Cursor..."
-            cursor .
+            env SHELL=(which fish) cursor .
             echo "Launching Claude Code..."
-            claude --dangerously-skip-permissions
+            env SHELL=(which fish) claude --dangerously-skip-permissions
         case '*'
             echo "Error: Unknown subcommand '$subcommand'"
             echo "Run 'wt help' for usage information"
@@ -370,17 +370,17 @@ function _wt_new --description "Create new worktree"
                 # Launch both editors
                 echo ""
                 echo "Launching Cursor..."
-                cursor .
+                env SHELL=(which fish) cursor .
                 echo "Launching Claude Code..."
-                claude --dangerously-skip-permissions
+                env SHELL=(which fish) claude --dangerously-skip-permissions
             else if test $launch_cursor = true
                 echo ""
                 echo "Launching Cursor..."
-                cursor .
+                env SHELL=(which fish) cursor .
             else if test $launch_claude = true
                 echo ""
                 echo "Launching Claude Code..."
-                claude --dangerously-skip-permissions
+                env SHELL=(which fish) claude --dangerously-skip-permissions
             end
         end
     else
