@@ -113,7 +113,11 @@ alias exa='eza'
 
 # Claude function to avoid infinite recursion
 function claude --description 'Claude Code with skip permissions'
-    command claude --dangerously-skip-permissions $argv
+    if command -q vt
+        vt claude --dangerously-skip-permissions $argv
+    else
+        command claude --dangerously-skip-permissions $argv
+    end
 end
 
 # Interactive session configuration
