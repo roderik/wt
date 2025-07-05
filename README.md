@@ -26,14 +26,30 @@
 ### Installation
 
 ```fish
-# Install wt as a Fish function
+# Option 1: Quick install (Fish only)
 mkdir -p ~/.config/fish/functions && \
 curl -s https://raw.githubusercontent.com/roderik/wt/main/wt.fish > ~/.config/fish/functions/wt.fish && \
 source ~/.config/fish/config.fish
 
+# Option 2: Full install with Fish & Zsh support
+git clone https://github.com/roderik/wt.git && \
+cd wt && \
+./install.fish
+
+# Option 3: Full install with dev tools
+git clone https://github.com/roderik/wt.git && \
+cd wt && \
+./install.fish --with-dev
+
 # Verify installation
 wt help
 ```
+
+The full install script (`install.fish`) will:
+- Install wt for both Fish and Zsh shells
+- Set up consistent aliases and paths across both shells
+- Configure modern shell enhancements (if installed): starship, direnv, zoxide, atuin
+- Create a zsh wrapper function that calls the Fish implementation
 
 ### Basic Usage
 
