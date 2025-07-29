@@ -113,10 +113,21 @@ alias exa='eza'
 
 # Claude function to avoid infinite recursion
 function claude --description 'Claude Code with skip permissions'
-    if command -q vt
-        vt claude --dangerously-skip-permissions $argv
+    # Check if .claude/AUTO_PLAN_MODE.txt exists in current directory
+    if test -f .claude/AUTO_PLAN_MODE.txt
+        # Use the file content as system prompt
+        if command -q vt
+            vt -q claude --dangerously-skip-permissions --append-system-prompt (cat .claude/AUTO_PLAN_MODE.txt | string collect) $argv
+        else
+            command claude --dangerously-skip-permissions --append-system-prompt (cat .claude/AUTO_PLAN_MODE.txt | string collect) $argv
+        end
     else
-        command claude --dangerously-skip-permissions $argv
+        # Run normally without the append-system-prompt
+        if command -q vt
+            vt -q claude --dangerously-skip-permissions $argv
+        else
+            command claude --dangerously-skip-permissions $argv
+        end
     end
 end
 
