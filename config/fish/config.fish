@@ -23,7 +23,10 @@ set -gx NODE_NO_WARNINGS 1
 
 # Claude
 set -gx ENABLE_BACKGROUND_TASKS 1
+set -gx FORCE_AUTO_BACKGROUND_TASKS 1
+set -gx CLAUDE_CODE_ENABLE_UNIFIED_READ_TOOL 1
 set -gx CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR 1
+set -gx BASH_MAX_TIMEOUT_MS 600000
 
 # Default editor
 set -gx EDITOR nvim
@@ -246,3 +249,8 @@ end
 if command -q atuin
     atuin init fish | source
 end
+
+fish_add_path -a "$HOME/.local/bin"
+
+
+string match -q "$TERM_PROGRAM" "kiro" and . (kiro --locate-shell-integration-path fish)
