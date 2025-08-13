@@ -2,12 +2,19 @@
 
 > Streamlined git worktree management for Fish shell with intelligent dependency handling
 
-**Author:** [@r0derik](https://x.com/r0derik) on X
+**Author:** [@r0derik](https://x.com/r0derik)
 
 [![Fish Shell](https://img.shields.io/badge/Fish_Shell-4.0+-blue.svg)](https://fishshell.com/)
 [![Git](https://img.shields.io/badge/Git-2.5+-red.svg)](https://git-scm.com/)
 [![Multi Package Manager](https://img.shields.io/badge/Package_Manager-Bun|NPM|Yarn|PNPM-orange.svg)](https://bun.sh/)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-black.svg)](https://github.com/roderik/wt)
+
+## My Development Setup
+
+This repository is part of my complete development environment:
+
+- 🐚 **[Shell Config](https://github.com/roderik/shell-config)** - Fish shell, starship prompt, and terminal setup
+- 🤖 **[AI Rules](https://github.com/roderik/ai-rules)** - Custom Claude Code (CLAUDE.md) instructions
+- 🌿 **[WT Worktree Manager](https://github.com/roderik/wt)** - This repository
 
 ## What is wt?
 
@@ -102,13 +109,13 @@ my-project/                 # Main repository
 
 ### Package Manager Detection
 
-| Lock File | Package Manager | Command |
-|-----------|----------------|---------|
-| `bun.lock`/`bun.lockb` | Bun | `bun install` |
-| `package-lock.json` | NPM | `npm install` |
-| `yarn.lock` | Yarn | `yarn install` |
-| `pnpm-lock.yaml` | PNPM | `pnpm install` |
-| None (default) | Bun | `bun install` |
+| Lock File              | Package Manager | Command        |
+| ---------------------- | --------------- | -------------- |
+| `bun.lock`/`bun.lockb` | Bun             | `bun install`  |
+| `package-lock.json`    | NPM             | `npm install`  |
+| `yarn.lock`            | Yarn            | `yarn install` |
+| `pnpm-lock.yaml`       | PNPM            | `pnpm install` |
+| None (default)         | Bun             | `bun install`  |
 
 ## Examples
 
@@ -157,10 +164,6 @@ wt switch approach-1
 - [Fish Shell](https://fishshell.com/) 4.0+
 - [Git](https://git-scm.com/) 2.5+ (with worktree support)
 - Package manager: [Bun](https://bun.sh/), NPM, [Yarn](https://yarnpkg.com/), or [PNPM](https://pnpm.io/)
-
-### Don't have Fish shell?
-
-Check out our [Fish Shell Setup Guide](FISH_SETUP.md) for a complete modern terminal setup with Fish and powerful development tools.
 
 ## Advanced Usage
 
@@ -227,14 +230,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 ### Common Issues
 
 **"Not in a git repository"**
+
 - Ensure you're inside a git repository
 - Run `git status` to verify
 
 **"Branch already exists"**
+
 - Use `wt switch <branch>` instead
 - Or remove it first: `wt remove <branch>`
 
 **Package installation fails**
+
 - Check your package manager is installed
 - Verify lock files aren't corrupted
 - Try removing `node_modules` and reinstalling
@@ -260,4 +266,4 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 **⭐ Star this repository if it helps your workflow!**
 
-[Open an Issue](https://github.com/roderik/wt/issues) | [Submit a PR](https://github.com/roderik/wt/pulls) | [Fish Setup Guide](FISH_SETUP.md)
+[Open an Issue](https://github.com/roderik/wt/issues) | [Submit a PR](https://github.com/roderik/wt/pulls)
