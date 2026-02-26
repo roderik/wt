@@ -159,7 +159,7 @@ jobs:
 
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: test-results-${{ matrix.os }}
         path: |
@@ -417,7 +417,7 @@ jobs:
         grep -h "test_case" tests/test_*.fish | sed 's/.*test_case "/- /g' | sed 's/".*//g' | sort | uniq >> coverage-report.md
 
     - name: Upload coverage report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: coverage-report
         path: coverage-report.md
