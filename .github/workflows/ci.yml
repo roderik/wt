@@ -28,7 +28,7 @@ jobs:
       should_test: ${{ steps.check.outputs.should_test }}
 
     steps:
-    - uses: fuxingloh/multi-labeler@v4
+    - uses: fuxingloh/multi-labeler@v5
       if: github.event_name == 'pull_request'
 
     - name: Checkout code
